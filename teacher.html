@@ -103,6 +103,34 @@
       border: 0;
       border-top: 1px solid #dce4ed;
     }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin-top: 16px;
+    }
+    .calendar-card {
+      padding: 16px;
+      border: 1px solid #dce4ed;
+      border-radius: 12px;
+      background: #fff;
+    }
+    .calendar-card h4 { margin: 0 0 12px; color: #183b63; }
+    .calendar-card label { display: block; margin: 10px 0 6px; font-weight: 600; }
+    .calendar-card input, .calendar-card select {
+      width: 100%; box-sizing: border-box; margin-bottom: 8px;
+    }
+    .calendar-list { margin-top: 12px; }
+    .calendar-item {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; padding: 12px 0; border-bottom: 1px solid #e5ebf2;
+    }
+    .calendar-item:last-child { border-bottom: 0; }
+    .calendar-item small { display: block; color: #68798d; margin-top: 4px; }
+    .calendar-item button { flex-shrink: 0; }
+    .calendar-status { margin-top: 10px; color: #68798d; }
+
   </style>
 </head>
 
@@ -331,7 +359,98 @@
       <hr class="section-divider">
 
 
-      <!-- OTHER TOOLS -->
+
+      <!-- SCHOOL CALENDAR MANAGEMENT -->
+      <hr class="section-divider">
+
+      <div class="tool-section" id="calendarManagement">
+        <h3>School Calendar Management</h3>
+        <p class="muted">
+          Manage academic years, school terms and holidays. Students will be able to view this calendar from their dashboard.
+        </p>
+
+        <div class="calendar-grid">
+          <div class="calendar-card">
+            <h4>Add Academic Year</h4>
+            <form id="academicYearForm">
+              <label for="yearName">Academic year</label>
+              <input id="yearName" type="text" placeholder="e.g. 2026" required maxlength="20">
+              <label for="yearStartDate">Start date</label>
+              <input id="yearStartDate" type="date" required>
+              <label for="yearEndDate">End date</label>
+              <input id="yearEndDate" type="date" required>
+              <button class="primary-btn" id="saveYearButton" type="submit">Save Academic Year</button>
+            </form>
+            <p class="form-message" id="yearMessage" role="status"></p>
+          </div>
+
+          <div class="calendar-card">
+            <h4>Add School Term</h4>
+            <form id="termForm">
+              <label for="termYear">Academic year</label>
+              <select id="termYear" required>
+                <option value="">Select academic year</option>
+              </select>
+              <label for="termName">Term name</label>
+              <select id="termName" required>
+                <option value="">Select term</option>
+                <option value="Term 1">Term 1</option>
+                <option value="Term 2">Term 2</option>
+                <option value="Term 3">Term 3</option>
+              </select>
+              <label for="termStartDate">Start date</label>
+              <input id="termStartDate" type="date" required>
+              <label for="termEndDate">End date</label>
+              <input id="termEndDate" type="date" required>
+              <button class="primary-btn" id="saveTermButton" type="submit">Save Term</button>
+            </form>
+            <p class="form-message" id="termMessage" role="status"></p>
+          </div>
+
+          <div class="calendar-card">
+            <h4>Add Holiday</h4>
+            <form id="holidayForm">
+              <label for="holidayYear">Academic year (optional)</label>
+              <select id="holidayYear">
+                <option value="">Not linked to a year</option>
+              </select>
+              <label for="holidayName">Holiday name</label>
+              <input id="holidayName" type="text" placeholder="e.g. Public Holiday" required maxlength="100">
+              <label for="holidayDate">Holiday date</label>
+              <input id="holidayDate" type="date" required>
+              <label for="holidayType">Holiday type</label>
+              <select id="holidayType" required>
+                <option value="Public Holiday">Public Holiday</option>
+                <option value="School Holiday">School Holiday</option>
+                <option value="Special Holiday">Special Holiday</option>
+                <option value="Other">Other</option>
+              </select>
+              <button class="primary-btn" id="saveHolidayButton" type="submit">Save Holiday</button>
+            </form>
+            <p class="form-message" id="holidayMessage" role="status"></p>
+          </div>
+        </div>
+
+        <div class="calendar-card" style="margin-top:18px">
+          <h4>Saved Academic Years</h4>
+          <div id="academicYearsList" class="calendar-list">Loading...</div>
+        </div>
+
+        <div class="calendar-card" style="margin-top:18px">
+          <h4>Saved School Terms</h4>
+          <div id="schoolTermsList" class="calendar-list">Loading...</div>
+        </div>
+
+        <div class="calendar-card" style="margin-top:18px">
+          <h4>Saved Holidays</h4>
+          <div id="schoolHolidaysList" class="calendar-list">Loading...</div>
+        </div>
+
+        <p id="calendarLoadMessage" class="calendar-status" role="status"></p>
+      </div>
+
+
+            <!-- OTHER TOOLS -->
 
       <h3>Other Teacher Tools</h3>
 
@@ -456,6 +575,8 @@ async function checkTeacher() {
     "teacherEmailDisplay"
   ).textContent =
     session.user.email || "Authorised teacher";
+
+  await loadCalendarData();
 
 }
 
@@ -983,6 +1104,266 @@ async function recordAttendance(qrToken) {
   }
 
 }
+
+
+
+// SCHOOL CALENDAR MANAGEMENT
+
+const calendarMessage = document.getElementById("calendarLoadMessage");
+
+function setCalendarMessage(message, isError = false) {
+  calendarMessage.textContent = message;
+  calendarMessage.style.color = isError ? "#a32121" : "#68798d";
+}
+
+function formatDate(dateValue) {
+  if (!dateValue) return "";
+  const date = new Date(dateValue + "T00:00:00");
+  return date.toLocaleDateString(undefined, {
+    year: "numeric", month: "short", day: "numeric"
+  });
+}
+
+function escapeCalendarText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[char]);
+}
+
+async function loadCalendarData() {
+  setCalendarMessage("Loading school calendar...");
+  try {
+    const [yearsResult, termsResult, holidaysResult] = await Promise.all([
+      supabase.from("academic_years")
+        .select("id, year_name, start_date, end_date")
+        .order("start_date", { ascending: false }),
+      supabase.from("school_terms")
+        .select("id, academic_year_id, term_name, start_date, end_date")
+        .order("start_date", { ascending: true }),
+      supabase.from("school_holidays")
+        .select("id, academic_year_id, holiday_name, holiday_date, holiday_type")
+        .order("holiday_date", { ascending: true })
+    ]);
+
+    if (yearsResult.error) throw yearsResult.error;
+    if (termsResult.error) throw termsResult.error;
+    if (holidaysResult.error) throw holidaysResult.error;
+
+    const years = yearsResult.data || [];
+    const terms = termsResult.data || [];
+    const holidays = holidaysResult.data || [];
+
+    const yearOptions = years.map(year =>
+      `<option value="${year.id}">${escapeCalendarText(year.year_name)}</option>`
+    ).join("");
+
+    document.getElementById("termYear").innerHTML =
+      '<option value="">Select academic year</option>' + yearOptions;
+    document.getElementById("holidayYear").innerHTML =
+      '<option value="">Not linked to a year</option>' + yearOptions;
+
+    const yearNameById = Object.fromEntries(
+      years.map(year => [String(year.id), year.year_name])
+    );
+
+    document.getElementById("academicYearsList").innerHTML = years.length
+      ? years.map(year => `
+          <div class="calendar-item">
+            <div><strong>${escapeCalendarText(year.year_name)}</strong>
+              <small>${formatDate(year.start_date)} – ${formatDate(year.end_date)}</small>
+            </div>
+            <button class="secondary-btn" type="button" data-delete-year="${year.id}">Delete</button>
+          </div>`).join("")
+      : "<p>No academic years added yet.</p>";
+
+    document.getElementById("schoolTermsList").innerHTML = terms.length
+      ? terms.map(term => `
+          <div class="calendar-item">
+            <div><strong>${escapeCalendarText(term.term_name)}</strong>
+              <small>${escapeCalendarText(yearNameById[String(term.academic_year_id)] || "Academic year")} · ${formatDate(term.start_date)} – ${formatDate(term.end_date)}</small>
+            </div>
+            <button class="secondary-btn" type="button" data-delete-term="${term.id}">Delete</button>
+          </div>`).join("")
+      : "<p>No school terms added yet.</p>";
+
+    document.getElementById("schoolHolidaysList").innerHTML = holidays.length
+      ? holidays.map(holiday => `
+          <div class="calendar-item">
+            <div><strong>${escapeCalendarText(holiday.holiday_name)}</strong>
+              <small>${formatDate(holiday.holiday_date)} · ${escapeCalendarText(holiday.holiday_type)}${holiday.academic_year_id ? " · " + escapeCalendarText(yearNameById[String(holiday.academic_year_id)] || "") : ""}</small>
+            </div>
+            <button class="secondary-btn" type="button" data-delete-holiday="${holiday.id}">Delete</button>
+          </div>`).join("")
+      : "<p>No holidays added yet.</p>";
+
+    setCalendarMessage("School calendar loaded.");
+  } catch (error) {
+    console.error("Calendar load error:", error);
+    setCalendarMessage(
+      error.message || "Could not load school calendar. Check database permissions.",
+      true
+    );
+  }
+}
+
+document.getElementById("academicYearForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = document.getElementById("saveYearButton");
+  const message = document.getElementById("yearMessage");
+  const year_name = document.getElementById("yearName").value.trim();
+  const start_date = document.getElementById("yearStartDate").value;
+  const end_date = document.getElementById("yearEndDate").value;
+
+  if (end_date < start_date) {
+    message.textContent = "End date must be on or after the start date.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Saving academic year...";
+  try {
+    const { error } = await supabase.from("academic_years").insert({
+      year_name, start_date, end_date
+    });
+    if (error) throw error;
+    document.getElementById("academicYearForm").reset();
+    message.textContent = "Academic year saved successfully.";
+    await loadCalendarData();
+  } catch (error) {
+    console.error("Save academic year error:", error);
+    message.textContent = error.message || "Could not save academic year.";
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.getElementById("termForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = document.getElementById("saveTermButton");
+  const message = document.getElementById("termMessage");
+  const academic_year_id = Number(document.getElementById("termYear").value);
+  const term_name = document.getElementById("termName").value;
+  const start_date = document.getElementById("termStartDate").value;
+  const end_date = document.getElementById("termEndDate").value;
+
+  if (!academic_year_id) {
+    message.textContent = "Please select an academic year.";
+    return;
+  }
+  if (end_date < start_date) {
+    message.textContent = "End date must be on or after the start date.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Saving school term...";
+  try {
+    const { error } = await supabase.from("school_terms").insert({
+      academic_year_id, term_name, start_date, end_date
+    });
+    if (error) throw error;
+    document.getElementById("termForm").reset();
+    message.textContent = "School term saved successfully.";
+    await loadCalendarData();
+  } catch (error) {
+    console.error("Save school term error:", error);
+    message.textContent = error.message || "Could not save school term.";
+  } finally {
+    button.disabled = false;
+  }
+});
+
+async function markDateAsNonSchoolDay(dateValue) {
+  // Keep the existing school_days table in sync so attendance calculations can exclude this date.
+  const { data: existingDay, error: findError } = await supabase
+    .from("school_days")
+    .select("id")
+    .eq("school_date", dateValue)
+    .limit(1)
+    .maybeSingle();
+
+  if (findError) throw findError;
+
+  if (existingDay) {
+    const { error } = await supabase
+      .from("school_days")
+      .update({ is_school_day: false })
+      .eq("id", existingDay.id);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase
+      .from("school_days")
+      .insert({ school_date: dateValue, is_school_day: false });
+    if (error) throw error;
+  }
+}
+
+document.getElementById("holidayForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = document.getElementById("saveHolidayButton");
+  const message = document.getElementById("holidayMessage");
+  const yearValue = document.getElementById("holidayYear").value;
+  const holiday_name = document.getElementById("holidayName").value.trim();
+  const holiday_date = document.getElementById("holidayDate").value;
+  const holiday_type = document.getElementById("holidayType").value;
+
+  button.disabled = true;
+  message.textContent = "Saving holiday...";
+  try {
+    const { error } = await supabase.from("school_holidays").insert({
+      academic_year_id: yearValue ? Number(yearValue) : null,
+      holiday_name, holiday_date, holiday_type
+    });
+    if (error) throw error;
+    await markDateAsNonSchoolDay(holiday_date);
+    document.getElementById("holidayForm").reset();
+    message.textContent = "Holiday saved and marked as a non-school day.";
+    await loadCalendarData();
+  } catch (error) {
+    console.error("Save holiday error:", error);
+    message.textContent = error.message || "Could not save holiday.";
+  } finally {
+    button.disabled = false;
+  }
+});
+
+// Delete actions are delegated because calendar rows are re-rendered after each change.
+document.getElementById("calendarManagement").addEventListener("click", async event => {
+  const button = event.target.closest("button");
+  if (!button) return;
+
+  let table = "";
+  let id = "";
+  if (button.dataset.deleteYear) {
+    table = "academic_years";
+    id = button.dataset.deleteYear;
+  } else if (button.dataset.deleteTerm) {
+    table = "school_terms";
+    id = button.dataset.deleteTerm;
+  } else if (button.dataset.deleteHoliday) {
+    table = "school_holidays";
+    id = button.dataset.deleteHoliday;
+  } else {
+    return;
+  }
+
+  const itemType = table === "academic_years" ? "academic year"
+    : table === "school_terms" ? "school term" : "holiday";
+
+  if (!confirm(`Delete this ${itemType}? This cannot be undone.`)) return;
+
+  button.disabled = true;
+  try {
+    const { error } = await supabase.from(table).delete().eq("id", id);
+    if (error) throw error;
+    setCalendarMessage(`${itemType} deleted successfully.`);
+    await loadCalendarData();
+  } catch (error) {
+    console.error("Calendar delete error:", error);
+    setCalendarMessage(error.message || `Could not delete ${itemType}.`, true);
+    button.disabled = false;
+  }
+});
 
 
 // LOGOUT
