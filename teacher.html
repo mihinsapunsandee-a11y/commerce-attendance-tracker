@@ -8,10 +8,13 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
-    .tool-section { margin-top: 24px; }
-    .tool-section input { margin-bottom: 12px; }
+    .tool-section {
+      margin-top: 24px;
+    }
 
-    .form-message { margin-top: 12px; }
+    .form-message {
+      margin-top: 12px;
+    }
 
     .qr-result {
       margin-top: 20px;
@@ -28,11 +31,13 @@
       max-width: 100%;
     }
 
-    .qr-result[hidden] { display: none; }
+    .qr-result[hidden] {
+      display: none;
+    }
 
     .scanner-box {
-      margin-top: 18px;
-      padding: 16px;
+      margin: 18px 0;
+      padding: 18px;
       border: 1px solid #dce4ed;
       border-radius: 12px;
       background: #fff;
@@ -41,7 +46,7 @@
     #reader {
       width: 100%;
       max-width: 450px;
-      margin: 16px auto;
+      margin: 18px auto;
     }
 
     #reader video {
@@ -52,7 +57,7 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 14px;
+      margin-top: 15px;
     }
 
     .scanner-buttons button {
@@ -61,8 +66,8 @@
     }
 
     .scan-message {
-      margin-top: 14px;
       padding: 12px;
+      margin-top: 15px;
       border-radius: 8px;
       background: #f3f6fa;
       overflow-wrap: anywhere;
@@ -92,6 +97,12 @@
       opacity: 0.6;
       cursor: not-allowed;
     }
+
+    .section-divider {
+      margin: 28px 0;
+      border: 0;
+      border-top: 1px solid #dce4ed;
+    }
   </style>
 </head>
 
@@ -105,23 +116,30 @@
       <small>R / Eheliyagoda Central College</small>
     </span>
   </a>
+
   <span class="portal-label">TEACHER PORTAL</span>
 </header>
+
 
 <main class="dashboard-wrap narrow">
 
   <!-- TEACHER LOGIN -->
+
   <section id="loginSection">
+
     <p class="eyebrow dark">AUTHORISED STAFF</p>
     <h1>Teacher portal</h1>
+
     <p class="muted">
       Sign in using your authorised teacher account.
     </p>
 
     <section class="panel">
+
       <form id="teacherLoginForm">
 
         <label for="teacherEmail">Teacher email</label>
+
         <input
           id="teacherEmail"
           type="email"
@@ -131,6 +149,7 @@
         >
 
         <label for="teacherPassword">Password</label>
+
         <input
           id="teacherPassword"
           type="password"
@@ -144,112 +163,42 @@
         </button>
 
         <p id="loginMessage" class="form-message" role="status"></p>
+
       </form>
+
     </section>
   </section>
 
 
+
   <!-- TEACHER DASHBOARD -->
+
   <section id="teacherSection" hidden>
 
     <p class="eyebrow dark">AUTHORISED STAFF</p>
+
     <h1>Teacher portal</h1>
-    <p class="muted">Commerce Attendance Tracker · Grade 12</p>
+
+    <p class="muted">
+      Commerce Attendance Tracker · Grade 12
+    </p>
+
 
     <section class="panel">
 
       <h2>Welcome, Teacher</h2>
+
       <p class="muted" id="teacherEmailDisplay"></p>
 
 
-      <!-- STUDENT REGISTRATION -->
-      <div class="tool-section">
+      <!-- QR SCANNER - SHOWN FIRST -->
 
-        <h3>Register a New Student</h3>
-
-        <p class="muted">
-          Create a student account and generate their unique QR code.
-        </p>
-
-        <form id="studentForm">
-
-          <label for="admissionNumber">Admission Number</label>
-          <input
-            id="admissionNumber"
-            type="text"
-            placeholder="Enter admission number"
-            required
-          >
-
-          <label for="fullName">Student Full Name</label>
-          <input
-            id="fullName"
-            type="text"
-            placeholder="Enter student's full name"
-            required
-          >
-
-          <label for="studentPassword">Student Password</label>
-          <input
-            id="studentPassword"
-            type="password"
-            placeholder="Create a password (minimum 8 characters)"
-            minlength="8"
-            maxlength="128"
-            required
-          >
-
-          <button
-            class="primary-btn"
-            id="createStudentButton"
-            type="submit"
-          >
-            Create Student Account
-          </button>
-
-          <p id="studentMessage" class="form-message" role="status"></p>
-        </form>
-
-
-        <!-- QR RESULT -->
-        <div id="qrResult" class="qr-result" hidden>
-
-          <h3>Student Registered Successfully</h3>
-
-          <p id="registeredStudentName"></p>
-
-          <p class="muted">
-            Student's unique attendance QR code
-          </p>
-
-          <canvas id="qrCanvas"></canvas>
-
-          <p class="muted">
-            Save or print this QR code and give it to the student.
-          </p>
-
-          <button
-            class="primary-btn"
-            id="printQrButton"
-            type="button"
-          >
-            Print QR Code
-          </button>
-
-        </div>
-      </div>
-
-
-      <hr>
-
-
-      <!-- QR ATTENDANCE SCANNER -->
       <div class="tool-section">
 
         <h3>Scan Student QR Code</h3>
 
         <p class="muted">
-          Scan a registered student's QR code to record their attendance.
+          Scan a registered student's QR code to record attendance.
         </p>
 
         <div class="scanner-box">
@@ -287,11 +236,102 @@
           </p>
 
         </div>
+
       </div>
 
 
-      <hr>
+      <hr class="section-divider">
 
+
+      <!-- STUDENT REGISTRATION -->
+
+      <div class="tool-section">
+
+        <h3>Register a New Student</h3>
+
+        <p class="muted">
+          Create a student account and generate their unique QR code.
+        </p>
+
+        <form id="studentForm">
+
+          <label for="admissionNumber">Admission Number</label>
+
+          <input
+            id="admissionNumber"
+            type="text"
+            placeholder="Enter admission number"
+            required
+          >
+
+          <label for="fullName">Student Full Name</label>
+
+          <input
+            id="fullName"
+            type="text"
+            placeholder="Enter student's full name"
+            required
+          >
+
+          <label for="studentPassword">Student Password</label>
+
+          <input
+            id="studentPassword"
+            type="password"
+            placeholder="Create a password (minimum 8 characters)"
+            minlength="8"
+            maxlength="128"
+            required
+          >
+
+          <button
+            class="primary-btn"
+            id="createStudentButton"
+            type="submit"
+          >
+            Create Student Account
+          </button>
+
+          <p id="studentMessage" class="form-message" role="status"></p>
+
+        </form>
+
+
+        <!-- GENERATED QR CODE -->
+
+        <div id="qrResult" class="qr-result" hidden>
+
+          <h3>Student Registered Successfully</h3>
+
+          <p id="registeredStudentName"></p>
+
+          <p class="muted">
+            Student's unique attendance QR code
+          </p>
+
+          <canvas id="qrCanvas"></canvas>
+
+          <p class="muted">
+            Save or print this QR code and give it to the student.
+          </p>
+
+          <button
+            class="primary-btn"
+            id="printQrButton"
+            type="button"
+          >
+            Print QR Code
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <hr class="section-divider">
+
+
+      <!-- OTHER TOOLS -->
 
       <h3>Other Teacher Tools</h3>
 
@@ -312,6 +352,7 @@
       </button>
 
     </section>
+
   </section>
 
 </main>
@@ -415,6 +456,7 @@ async function checkTeacher() {
     "teacherEmailDisplay"
   ).textContent =
     session.user.email || "Authorised teacher";
+
 }
 
 
@@ -499,8 +541,6 @@ document.getElementById("studentForm")
 
   try {
 
-    // GET CURRENT TEACHER SESSION
-
     const { data: sessionData, error: sessionError } =
       await supabase.auth.getSession();
 
@@ -531,7 +571,7 @@ document.getElementById("studentForm")
     }
 
 
-    // CALL CREATE-STUDENT FUNCTION
+    // CREATE STUDENT ACCOUNT
 
     const { data, error } =
       await supabase.functions.invoke(
@@ -719,7 +759,7 @@ function showScanMessage(message, type = "") {
 }
 
 
-// STOP QR SCANNER
+// STOP SCANNER
 
 async function stopScanner() {
 
@@ -745,7 +785,7 @@ async function stopScanner() {
 }
 
 
-// START QR SCANNER
+// START SCANNER
 
 document.getElementById("startScannerButton")
 .addEventListener("click", async () => {
@@ -786,7 +826,6 @@ document.getElementById("startScannerButton")
 
         scanProcessing = true;
 
-        // Stop after reading one QR code
         await stopScanner();
 
         await recordAttendance(decodedText);
@@ -796,7 +835,7 @@ document.getElementById("startScannerButton")
       },
 
       () => {
-        // Normal scanning frames may have no QR code.
+        // No QR code found in this frame.
       }
 
     );
@@ -849,8 +888,6 @@ async function recordAttendance(qrToken) {
 
   try {
 
-    // GET TEACHER SESSION
-
     const { data: sessionData, error: sessionError } =
       await supabase.auth.getSession();
 
@@ -881,7 +918,7 @@ async function recordAttendance(qrToken) {
     }
 
 
-    // CALL MARK-ATTENDANCE EDGE FUNCTION
+    // CALL MARK-ATTENDANCE FUNCTION
 
     const { data, error } =
       await supabase.functions.invoke(
