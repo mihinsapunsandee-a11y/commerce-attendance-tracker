@@ -6,6 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Attendance | Commerce Attendance Tracker</title>
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .calendar-panel { margin: 24px 0; }
+    .calendar-controls { display:flex; gap:14px; flex-wrap:wrap; margin:16px 0; }
+    .calendar-controls label { display:block; font-weight:600; margin-bottom:7px; }
+    .calendar-controls select { min-width:190px; max-width:100%; padding:11px; border:1px solid #dce4ed; border-radius:8px; background:#fff; }
+    .calendar-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:18px; }
+    .calendar-card { padding:16px; border:1px solid #dce4ed; border-radius:12px; background:#fff; }
+    .calendar-card h3 { margin:0 0 12px; }
+    .calendar-item { padding:10px 0; border-bottom:1px solid #edf1f5; }
+    .calendar-item:last-child { border-bottom:0; }
+    .calendar-item strong { display:block; }
+    .calendar-item small { color:#68798d; }
+    .calendar-empty { color:#68798d; font-size:.95rem; }
+  </style>
+
 </head>
 <body>
   <header class="topbar">
@@ -32,6 +48,38 @@
     </div>
 
     <p id="dashboardMessage" class="form-message" role="status"></p>
+
+
+    <section class="panel calendar-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow dark">SCHOOL CALENDAR</p>
+          <h2>Academic calendar</h2>
+          <p class="muted small-text">View your academic year, terms and holidays.</p>
+        </div>
+      </div>
+      <div class="calendar-controls">
+        <div>
+          <label for="academicYearSelect">Academic year</label>
+          <select id="academicYearSelect"><option value="">Loading years...</option></select>
+        </div>
+        <div>
+          <label for="termSelect">School term</label>
+          <select id="termSelect"><option value="">All terms</option></select>
+        </div>
+      </div>
+      <p id="calendarMessage" class="muted small-text" role="status">Loading school calendar...</p>
+      <div class="calendar-grid">
+        <div class="calendar-card">
+          <h3>Selected term</h3>
+          <div id="selectedTermDetails" class="calendar-empty">Select an academic year and term.</div>
+        </div>
+        <div class="calendar-card">
+          <h3>Upcoming holidays</h3>
+          <div id="upcomingHolidays" class="calendar-empty">No holiday information yet.</div>
+        </div>
+      </div>
+    </section>
 
     <section class="stats-grid">
       <article class="stat-card">
@@ -137,86 +185,221 @@
   </main>
 
   <script type="module">
-    import { createClient } from
-      "https://esm.sh/@supabase/supabase-js@2";
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const SUPABASE_URL =
-      "https://rnbgggtivkdytccpzvsg.supabase.co";
-
-    const SUPABASE_PUBLISHABLE_KEY =
-      "sb_publishable_Q0gvzQVL7njaiPGlsafH0g_1SA5qrZt";
-
-    const supabase = createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
-
+    const SUPABASE_URL = "https://rnbgggtivkdytccpzvsg.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Q0gvzQVL7njaiPGlsafH0g_1SA5qrZt";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     const el = (id) => document.getElementById(id);
+
+    let studentId = null;
+    let allSchoolDays = [];
+    let allAttendance = [];
+    let allTerms = [];
+    let allHolidays = [];
+    let selectedAcademicYear = null;
 
     function showMessage(message) {
       el("dashboardMessage").textContent = message;
     }
 
     function formatDate(dateString) {
-      return new Date(dateString + "T00:00:00")
-        .toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric"
-        });
+      return new Date(dateString + "T00:00:00").toLocaleDateString("en-GB", {
+        day: "2-digit", month: "short", year: "numeric"
+      });
+    }
+
+    function todayString() {
+      const now = new Date();
+      const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+      return local.toISOString().slice(0, 10);
     }
 
     function addHistoryRecord(date, status) {
       const row = document.createElement("div");
       row.className = "history-row";
-
       const dot = document.createElement("span");
-      dot.className =
-        "date-dot " + (status === "present" ? "present" : "absent");
-
+      dot.className = "date-dot " + (status === "present" ? "present" : "absent");
       const dateText = document.createElement("span");
       dateText.textContent = formatDate(date);
-
       const statusText = document.createElement("strong");
-      statusText.className =
-        status === "present" ? "present-text" : "absent-text";
-
-      statusText.textContent =
-        status.charAt(0).toUpperCase() + status.slice(1);
-
+      statusText.className = status === "present" ? "present-text" : "absent-text";
+      statusText.textContent = status.charAt(0).toUpperCase() + status.slice(1);
       row.append(dot, dateText, statusText);
       el("historyList").appendChild(row);
     }
 
+    function renderCalendar() {
+      const yearId = el("academicYearSelect").value;
+      const termId = el("termSelect").value;
+      const year = window.__academicYears?.find(item => String(item.id) === yearId);
+      const termsForYear = allTerms.filter(term => String(term.academic_year_id) === yearId);
+      const selectedTerm = termsForYear.find(term => String(term.id) === termId) || null;
+
+      if (!year) {
+        el("selectedTermDetails").textContent = "No academic year has been added yet.";
+        el("upcomingHolidays").textContent = "No holiday information available.";
+        el("calendarMessage").textContent = "Your school has not added an academic year yet.";
+        renderAttendance(null);
+        return;
+      }
+
+      const rangeStart = selectedTerm?.start_date || year.start_date;
+      const rangeEnd = selectedTerm?.end_date || year.end_date;
+      el("selectedTermDetails").replaceChildren();
+
+      const title = document.createElement("strong");
+      title.textContent = selectedTerm ? selectedTerm.term_name : "All terms";
+      const dates = document.createElement("p");
+      dates.className = "muted";
+      dates.textContent = formatDate(rangeStart) + " – " + formatDate(rangeEnd);
+      const yearText = document.createElement("p");
+      yearText.className = "muted small-text";
+      yearText.textContent = "Academic year: " + year.year_name;
+      el("selectedTermDetails").append(title, dates, yearText);
+
+      const holidays = allHolidays
+        .filter(item => String(item.academic_year_id) === yearId)
+        .filter(item => item.holiday_date >= rangeStart && item.holiday_date <= rangeEnd)
+        .filter(item => item.holiday_date >= todayString())
+        .sort((a, b) => a.holiday_date.localeCompare(b.holiday_date));
+
+      el("upcomingHolidays").replaceChildren();
+      if (holidays.length === 0) {
+        el("upcomingHolidays").textContent = "No upcoming holidays recorded for this period.";
+      } else {
+        holidays.forEach(holiday => {
+          const item = document.createElement("div");
+          item.className = "calendar-item";
+          const name = document.createElement("strong");
+          name.textContent = holiday.holiday_name;
+          const date = document.createElement("small");
+          date.textContent = formatDate(holiday.holiday_date) + " · " + holiday.holiday_type;
+          item.append(name, date);
+          el("upcomingHolidays").appendChild(item);
+        });
+      }
+
+      el("calendarMessage").textContent =
+        "Calendar information is provided by your teacher. School days shown in attendance are based on registered school dates.";
+      renderAttendance({ start: rangeStart, end: rangeEnd });
+    }
+
+    function renderAttendance(range) {
+      const days = allSchoolDays.filter(day =>
+        !range || (day.school_date >= range.start && day.school_date <= range.end)
+      );
+      const records = allAttendance.filter(record =>
+        !range || (record.school_date >= range.start && record.school_date <= range.end)
+      );
+
+      const present = records.filter(record => record.status === "present").length;
+      const absent = records.filter(record => record.status === "absent").length;
+      const totalDays = days.length;
+      const percentage = totalDays > 0 ? (present / totalDays) * 100 : 0;
+      const roundedPercentage = Math.round(percentage);
+
+      el("schoolDays").textContent = totalDays;
+      el("presentDays").textContent = present;
+      el("absentDays").textContent = absent;
+      el("attendanceRate").textContent = roundedPercentage + "%";
+      el("attendanceSummary").textContent = present + " of " + totalDays + " school days";
+      el("progressPercentage").textContent = roundedPercentage + "%";
+      el("progressFill").style.width = Math.min(percentage, 100) + "%";
+
+      if (totalDays === 0) {
+        el("targetStatus").textContent = "No school days";
+        el("targetMessage").textContent = "No school days have been registered for this period yet.";
+      } else if (percentage >= 80) {
+        el("targetStatus").textContent = "Target reached";
+        el("targetMessage").textContent = "You have reached the 80% attendance target for this period.";
+      } else {
+        const needed = Math.ceil((0.8 * totalDays - present) / 0.2);
+        el("targetStatus").textContent = "Below target";
+        el("targetMessage").textContent =
+          "You need approximately " + Math.max(0, needed) +
+          " consecutive present school days to reach 80%, assuming no additional absences.";
+      }
+
+      el("historyList").replaceChildren();
+      if (records.length === 0) {
+        el("historyList").textContent = "No attendance records available for this period yet.";
+      } else {
+        records.slice().sort((a, b) => b.school_date.localeCompare(a.school_date))
+          .slice(0, 10).forEach(record => addHistoryRecord(record.school_date, record.status));
+      }
+    }
+
+    async function loadCalendar() {
+      const [yearsResult, termsResult, holidaysResult] = await Promise.all([
+        supabase.from("academic_years").select("id, year_name, start_date, end_date").order("start_date", { ascending: false }),
+        supabase.from("school_terms").select("id, academic_year_id, term_name, start_date, end_date").order("start_date"),
+        supabase.from("school_holidays").select("id, academic_year_id, holiday_name, holiday_date, holiday_type").order("holiday_date")
+      ]);
+
+      if (yearsResult.error) throw yearsResult.error;
+      if (termsResult.error) throw termsResult.error;
+      if (holidaysResult.error) throw holidaysResult.error;
+
+      const years = yearsResult.data || [];
+      allTerms = termsResult.data || [];
+      allHolidays = holidaysResult.data || [];
+      window.__academicYears = years;
+
+      const yearSelect = el("academicYearSelect");
+      yearSelect.replaceChildren();
+      if (years.length === 0) {
+        yearSelect.add(new Option("No academic years", ""));
+        el("termSelect").replaceChildren(new Option("All terms", ""));
+        renderCalendar();
+        return;
+      }
+
+      years.forEach(year => yearSelect.add(new Option(year.year_name, year.id)));
+      const today = todayString();
+      const currentYear = years.find(year => year.start_date <= today && year.end_date >= today) || years[0];
+      yearSelect.value = String(currentYear.id);
+      selectedAcademicYear = currentYear.id;
+      updateTermOptions(true);
+    }
+
+    function updateTermOptions(chooseCurrent) {
+      const yearId = el("academicYearSelect").value;
+      const terms = allTerms.filter(term => String(term.academic_year_id) === yearId);
+      const termSelect = el("termSelect");
+      termSelect.replaceChildren();
+      termSelect.add(new Option("All terms", ""));
+      terms.forEach(term => termSelect.add(new Option(term.term_name, term.id)));
+
+      if (chooseCurrent) {
+        const today = todayString();
+        const current = terms.find(term => term.start_date <= today && term.end_date >= today);
+        if (current) termSelect.value = String(current.id);
+      }
+      renderCalendar();
+    }
+
     async function loadDashboard() {
       try {
-        const { data: sessionData, error: sessionError } =
-          await supabase.auth.getSession();
-
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         if (sessionError) throw sessionError;
-
         const session = sessionData.session;
-
         if (!session) {
           window.location.replace("index.html");
           return;
         }
 
         const user = session.user;
-
-        const { data: student, error: studentError } =
-          await supabase
-            .from("students")
-            .select("full_name, admission_number, grade, stream")
-            .eq("auth_user_id", user.id)
-            .maybeSingle();
+        const { data: student, error: studentError } = await supabase
+          .from("students")
+          .select("id, full_name, admission_number, grade, stream")
+          .eq("auth_user_id", user.id)
+          .maybeSingle();
 
         if (studentError) throw studentError;
+        if (!student) throw new Error("Student profile not found. Please contact your teacher.");
 
-        if (!student) {
-          throw new Error("Student profile not found. Please contact your teacher.");
-        }
-
+        studentId = student.id;
         el("studentName").textContent = student.full_name;
         el("admissionNumber").textContent = student.admission_number;
         el("studentStream").textContent = student.stream;
@@ -225,108 +408,34 @@
           "Welcome, " + student.full_name + ". Here is your attendance overview.";
 
         const [daysResult, attendanceResult] = await Promise.all([
-          supabase
-            .from("school_days")
-            .select("school_date")
-            .eq("is_school_day", true),
-
-          supabase
-            .from("attendance")
-            .select("school_date, status")
-            .eq("student_id", (
-              await supabase
-                .from("students")
-                .select("id")
-                .eq("auth_user_id", user.id)
-                .single()
-            ).data.id)
+          supabase.from("school_days").select("school_date").eq("is_school_day", true),
+          supabase.from("attendance").select("school_date, status").eq("student_id", studentId)
             .order("school_date", { ascending: false })
         ]);
 
         if (daysResult.error) throw daysResult.error;
         if (attendanceResult.error) throw attendanceResult.error;
+        allSchoolDays = daysResult.data || [];
+        allAttendance = attendanceResult.data || [];
 
-        const days = daysResult.data || [];
-        const records = attendanceResult.data || [];
-
-        const present = records.filter(
-          record => record.status === "present"
-        ).length;
-
-        const absent = records.filter(
-          record => record.status === "absent"
-        ).length;
-
-        const totalDays = days.length;
-
-        const percentage = totalDays > 0
-          ? (present / totalDays) * 100
-          : 0;
-
-        const roundedPercentage = Math.round(percentage);
-
-        el("schoolDays").textContent = totalDays;
-        el("presentDays").textContent = present;
-        el("absentDays").textContent = absent;
-        el("attendanceRate").textContent =
-          roundedPercentage + "%";
-
-        el("attendanceSummary").textContent =
-          present + " of " + totalDays + " school days";
-
-        el("progressPercentage").textContent =
-          roundedPercentage + "%";
-
-        el("progressFill").style.width =
-          Math.min(percentage, 100) + "%";
-
-        if (totalDays === 0) {
-          el("targetStatus").textContent = "No school days";
-          el("targetMessage").textContent =
-            "School days have not been registered yet.";
-        } else if (percentage >= 80) {
-          el("targetStatus").textContent = "Target reached";
-          el("targetMessage").textContent =
-            "You have reached the 80% attendance target.";
-        } else {
-          el("targetStatus").textContent = "Below target";
-          const needed = Math.ceil(
-            (0.8 * totalDays - present) / 0.2
-          );
-
-          el("targetMessage").textContent =
-            "You need approximately " + Math.max(0, needed) +
-            " consecutive present school days to reach 80%, assuming no additional absences.";
-        }
-
-        el("historyList").replaceChildren();
-
-        if (records.length === 0) {
-          el("historyList").textContent =
-            "No attendance records available yet.";
-        } else {
-          records.slice(0, 10).forEach(record => {
-            addHistoryRecord(record.school_date, record.status);
-          });
-        }
-
+        await loadCalendar();
       } catch (error) {
         console.error("Dashboard error:", error);
         showMessage(error.message || "Could not load dashboard data.");
       }
     }
 
+    el("academicYearSelect").addEventListener("change", () => updateTermOptions(true));
+    el("termSelect").addEventListener("change", renderCalendar);
+
     el("logoutButton").addEventListener("click", async () => {
       el("logoutButton").disabled = true;
-
       const { error } = await supabase.auth.signOut();
-
       if (error) {
         showMessage("Could not sign out. Please try again.");
         el("logoutButton").disabled = false;
         return;
       }
-
       window.location.replace("index.html");
     });
 
