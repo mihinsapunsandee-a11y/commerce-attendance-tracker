@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Attendance | Commerce Attendance Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand-small" href="index.html">
+      <span class="brand-mark small">EC</span>
+      <span>Commerce Attendance Tracker
+        <small>R / Eheliyagoda Central College</small>
+      </span>
+    </a>
+    <span class="portal-label">STUDENT PORTAL</span>
+  </header>
+
+  <main class="dashboard-wrap">
+
+    <div class="welcome-row">
+      <div>
+        <p class="eyebrow dark">GRADE 12 · COMMERCE</p>
+        <h1>My attendance</h1>
+        <p class="muted" id="welcomeMessage">Loading your attendance...</p>
+      </div>
+      <button id="logoutButton" class="primary-btn" type="button">
+        Sign out
+      </button>
+    </div>
+
+    <p id="dashboardMessage" class="form-message" role="status"></p>
+
+    <section class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-icon">▦</span>
+        <p class="stat-label">School days held</p>
+        <strong id="schoolDays">—</strong>
+        <small>Registered school days</small>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-icon green">✓</span>
+        <p class="stat-label">Days present</p>
+        <strong id="presentDays">—</strong>
+        <small>Recorded attendance</small>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-icon red">×</span>
+        <p class="stat-label">Days absent</p>
+        <strong id="absentDays">—</strong>
+        <small>Recorded absences</small>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-icon">%</span>
+        <p class="stat-label">Attendance</p>
+        <strong id="attendanceRate">—</strong>
+        <small id="attendanceSummary">Calculating...</small>
+      </article>
+    </section>
+
+    <section class="content-grid">
+
+      <article class="panel target-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow dark">ATTENDANCE GOAL</p>
+            <h2>Your 80% target</h2>
+          </div>
+          <span class="status-pill" id="targetStatus">Calculating</span>
+        </div>
+
+        <div class="progress-meta">
+          <strong id="progressPercentage">0%</strong>
+          <span>Required: 80%</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+
+        <p class="muted small-text" id="targetMessage">
+          Your attendance progress will appear here.
+        </p>
+      </article>
+
+      <article class="panel profile-panel">
+        <p class="eyebrow dark">STUDENT PROFILE</p>
+        <h2>My details</h2>
+
+        <div class="profile-line">
+          <span>Student name</span>
+          <strong id="studentName">Loading...</strong>
+        </div>
+
+        <div class="profile-line">
+          <span>Admission number</span>
+          <strong id="admissionNumber">Loading...</strong>
+        </div>
+
+        <div class="profile-line">
+          <span>Stream</span>
+          <strong id="studentStream">Loading...</strong>
+        </div>
+
+        <div class="profile-line">
+          <span>Grade</span>
+          <strong id="studentGrade">Loading...</strong>
+        </div>
+      </article>
+
+    </section>
+
+    <section class="panel history-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow dark">RECENT RECORDS</p>
+          <h2>Attendance history</h2>
+        </div>
+        <span class="muted small-text">Latest records</span>
+      </div>
+
+      <div id="historyList">
+        <p class="muted">Loading attendance records...</p>
+      </div>
+    </section>
+
+    <p class="disclaimer">
+      Attendance information is retrieved from authorised school records.
+      Please contact your teacher if you notice an incorrect record.
+    </p>
+
+  </main>
+
+  <script type="module">
+    import { createClient } from
+      "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL =
+      "https://rnbgggtivkdytccpzvsg.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_Q0gvzQVL7njaiPGlsafH0g_1SA5qrZt";
+
+    const supabase = createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+    const el = (id) => document.getElementById(id);
+
+    function showMessage(message) {
+      el("dashboardMessage").textContent = message;
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString + "T00:00:00")
+        .toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        });
+    }
+
+    function addHistoryRecord(date, status) {
+      const row = document.createElement("div");
+      row.className = "history-row";
+
+      const dot = document.createElement("span");
+      dot.className =
+        "date-dot " + (status === "present" ? "present" : "absent");
+
+      const dateText = document.createElement("span");
+      dateText.textContent = formatDate(date);
+
+      const statusText = document.createElement("strong");
+      statusText.className =
+        status === "present" ? "present-text" : "absent-text";
+
+      statusText.textContent =
+        status.charAt(0).toUpperCase() + status.slice(1);
+
+      row.append(dot, dateText, statusText);
+      el("historyList").appendChild(row);
+    }
+
+    async function loadDashboard() {
+      try {
+        const { data: sessionData, error: sessionError } =
+          await supabase.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        const session = sessionData.session;
+
+        if (!session) {
+          window.location.replace("index.html");
+          return;
+        }
+
+        const user = session.user;
+
+        const { data: student, error: studentError } =
+          await supabase
+            .from("students")
+            .select("full_name, admission_number, grade, stream")
+            .eq("auth_user_id", user.id)
+            .maybeSingle();
+
+        if (studentError) throw studentError;
+
+        if (!student) {
+          throw new Error("Student profile not found. Please contact your teacher.");
+        }
+
+        el("studentName").textContent = student.full_name;
+        el("admissionNumber").textContent = student.admission_number;
+        el("studentStream").textContent = student.stream;
+        el("studentGrade").textContent = student.grade;
+        el("welcomeMessage").textContent =
+          "Welcome, " + student.full_name + ". Here is your attendance overview.";
+
+        const [daysResult, attendanceResult] = await Promise.all([
+          supabase
+            .from("school_days")
+            .select("school_date")
+            .eq("is_school_day", true),
+
+          supabase
+            .from("attendance")
+            .select("school_date, status")
+            .eq("student_id", (
+              await supabase
+                .from("students")
+                .select("id")
+                .eq("auth_user_id", user.id)
+                .single()
+            ).data.id)
+            .order("school_date", { ascending: false })
+        ]);
+
+        if (daysResult.error) throw daysResult.error;
+        if (attendanceResult.error) throw attendanceResult.error;
+
+        const days = daysResult.data || [];
+        const records = attendanceResult.data || [];
+
+        const present = records.filter(
+          record => record.status === "present"
+        ).length;
+
+        const absent = records.filter(
+          record => record.status === "absent"
+        ).length;
+
+        const totalDays = days.length;
+
+        const percentage = totalDays > 0
+          ? (present / totalDays) * 100
+          : 0;
+
+        const roundedPercentage = Math.round(percentage);
+
+        el("schoolDays").textContent = totalDays;
+        el("presentDays").textContent = present;
+        el("absentDays").textContent = absent;
+        el("attendanceRate").textContent =
+          roundedPercentage + "%";
+
+        el("attendanceSummary").textContent =
+          present + " of " + totalDays + " school days";
+
+        el("progressPercentage").textContent =
+          roundedPercentage + "%";
+
+        el("progressFill").style.width =
+          Math.min(percentage, 100) + "%";
+
+        if (totalDays === 0) {
+          el("targetStatus").textContent = "No school days";
+          el("targetMessage").textContent =
+            "School days have not been registered yet.";
+        } else if (percentage >= 80) {
+          el("targetStatus").textContent = "Target reached";
+          el("targetMessage").textContent =
+            "You have reached the 80% attendance target.";
+        } else {
+          el("targetStatus").textContent = "Below target";
+          const needed = Math.ceil(
+            (0.8 * totalDays - present) / 0.2
+          );
+
+          el("targetMessage").textContent =
+            "You need approximately " + Math.max(0, needed) +
+            " consecutive present school days to reach 80%, assuming no additional absences.";
+        }
+
+        el("historyList").replaceChildren();
+
+        if (records.length === 0) {
+          el("historyList").textContent =
+            "No attendance records available yet.";
+        } else {
+          records.slice(0, 10).forEach(record => {
+            addHistoryRecord(record.school_date, record.status);
+          });
+        }
+
+      } catch (error) {
+        console.error("Dashboard error:", error);
+        showMessage(error.message || "Could not load dashboard data.");
+      }
+    }
+
+    el("logoutButton").addEventListener("click", async () => {
+      el("logoutButton").disabled = true;
+
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        showMessage("Could not sign out. Please try again.");
+        el("logoutButton").disabled = false;
+        return;
+      }
+
+      window.location.replace("index.html");
+    });
+
+    loadDashboard();
+  </script>
+</body>
+</html>

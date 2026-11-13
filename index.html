@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Login | R/Eheliyagoda Central College</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <section class="brand-panel">
+      <div class="brand-mark">EC</div>
+      <p class="eyebrow">R / EHELIYAGODA CENTRAL COLLEGE</p>
+      <h1>Commerce<br>Attendance Tracker</h1>
+      <p class="brand-copy">A simple way to follow your school attendance and keep track of your 80% target.</p>
+      <div class="brand-footer">GRADE 12 · A/L COMMERCE</div>
+    </section>
+
+    <section class="login-panel">
+      <div class="mobile-brand">EC · EHELIYAGODA CENTRAL COLLEGE</div>
+      <p class="eyebrow dark">STUDENT PORTAL</p>
+      <h2>Welcome back</h2>
+      <p class="muted">Sign in using the details provided by your school.</p>
+
+      <form id="loginForm">
+        <label for="admission">Admission number</label>
+        <input id="admission" name="admission" type="text"
+          autocomplete="username"
+          placeholder="Enter your admission number" required>
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password"
+          autocomplete="current-password"
+          placeholder="Enter your password" required>
+
+        <button class="primary-btn" id="loginButton" type="submit">
+          Sign in <span aria-hidden="true">→</span>
+        </button>
+
+        <p id="loginMessage" class="form-message" role="status">
+          Please enter your admission number and password.
+        </p>
+      </form>
+
+      <p class="privacy-note">
+        Your attendance information should only be visible to you and authorised school staff.
+      </p>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from
+      "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL =
+      "https://rnbgggtivkdytccpzvsg.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_Q0gvzQVL7njaiPGlsafH0g_1SA5qrZt";
+
+    const supabase = createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("loginMessage");
+    const button = document.getElementById("loginButton");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const admissionNumber =
+        document.getElementById("admission").value.trim();
+
+      const password =
+        document.getElementById("password").value;
+
+      message.textContent = "Signing in...";
+      button.disabled = true;
+
+      try {
+        const { data, error } =
+          await supabase.functions.invoke("student-login", {
+            body: {
+              admission_number: admissionNumber,
+              password: password
+            }
+          });
+
+        if (error) {
+          let errorMessage = error.message;
+
+          if (error.context && typeof error.context.json === "function") {
+            try {
+              const details = await error.context.json();
+              errorMessage =
+                details.error || details.message || errorMessage;
+            } catch (_) {}
+          }
+
+          throw new Error(errorMessage);
+        }
+
+        if (!data || !data.success || !data.session) {
+          throw new Error("Login could not be completed.");
+        }
+
+        const { error: sessionError } =
+          await supabase.auth.setSession({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token
+          });
+
+        if (sessionError) {
+          throw sessionError;
+        }
+
+        message.textContent = "Login successful! Opening dashboard...";
+
+        window.location.href = "dashboard.html";
+
+      } catch (error) {
+        console.error("Login error:", error);
+
+        message.textContent =
+          error.message || "Login failed. Please try again.";
+
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
