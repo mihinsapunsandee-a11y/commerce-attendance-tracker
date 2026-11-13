@@ -10,7 +10,9 @@
   <style>
     .tool-section { margin-top: 24px; }
     .tool-section input { margin-bottom: 12px; }
+
     .form-message { margin-top: 12px; }
+
     .qr-result {
       margin-top: 20px;
       padding: 20px;
@@ -19,12 +21,77 @@
       text-align: center;
       background: #fff;
     }
+
     .qr-result canvas {
       display: block;
       margin: 16px auto;
       max-width: 100%;
     }
+
     .qr-result[hidden] { display: none; }
+
+    .scanner-box {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid #dce4ed;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    #reader {
+      width: 100%;
+      max-width: 450px;
+      margin: 16px auto;
+    }
+
+    #reader video {
+      border-radius: 10px;
+    }
+
+    .scanner-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .scanner-buttons button {
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .scan-message {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f3f6fa;
+      overflow-wrap: anywhere;
+    }
+
+    .scan-message.success {
+      background: #e8f7ed;
+      color: #176b37;
+    }
+
+    .scan-message.error {
+      background: #fff0f0;
+      color: #a32121;
+    }
+
+    .secondary-btn {
+      padding: 12px 18px;
+      border: 1px solid #183b63;
+      border-radius: 8px;
+      background: #fff;
+      color: #183b63;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 
@@ -77,10 +144,10 @@
         </button>
 
         <p id="loginMessage" class="form-message" role="status"></p>
-
       </form>
     </section>
   </section>
+
 
   <!-- TEACHER DASHBOARD -->
   <section id="teacherSection" hidden>
@@ -93,6 +160,7 @@
 
       <h2>Welcome, Teacher</h2>
       <p class="muted" id="teacherEmailDisplay"></p>
+
 
       <!-- STUDENT REGISTRATION -->
       <div class="tool-section">
@@ -140,8 +208,8 @@
           </button>
 
           <p id="studentMessage" class="form-message" role="status"></p>
-
         </form>
+
 
         <!-- QR RESULT -->
         <div id="qrResult" class="qr-result" hidden>
@@ -169,10 +237,61 @@
           </button>
 
         </div>
-
       </div>
 
+
       <hr>
+
+
+      <!-- QR ATTENDANCE SCANNER -->
+      <div class="tool-section">
+
+        <h3>Scan Student QR Code</h3>
+
+        <p class="muted">
+          Scan a registered student's QR code to record their attendance.
+        </p>
+
+        <div class="scanner-box">
+
+          <div id="reader"></div>
+
+          <div class="scanner-buttons">
+
+            <button
+              class="primary-btn"
+              id="startScannerButton"
+              type="button"
+            >
+              Start Scanner
+            </button>
+
+            <button
+              class="secondary-btn"
+              id="stopScannerButton"
+              type="button"
+              disabled
+            >
+              Stop Scanner
+            </button>
+
+          </div>
+
+          <p
+            id="scanMessage"
+            class="scan-message"
+            role="status"
+            aria-live="polite"
+          >
+            Press Start Scanner to begin.
+          </p>
+
+        </div>
+      </div>
+
+
+      <hr>
+
 
       <h3>Other Teacher Tools</h3>
 
@@ -182,6 +301,7 @@
         <li>Review attendance and correct mistakes</li>
         <li>Manage registered school days</li>
       </ul>
+
 
       <button
         class="primary-btn"
@@ -196,6 +316,7 @@
 
 </main>
 
+
 <script type="module">
 
 import { createClient } from
@@ -203,6 +324,9 @@ import { createClient } from
 
 import QRCode from
   "https://esm.sh/qrcode@1.5.4";
+
+import { Html5Qrcode } from
+  "https://esm.sh/html5-qrcode@2.3.8";
 
 
 // SUPABASE CONFIGURATION
@@ -233,6 +357,16 @@ const loginMessage =
 
 const studentMessage =
   document.getElementById("studentMessage");
+
+const scanMessage =
+  document.getElementById("scanMessage");
+
+
+// SCANNER VARIABLES
+
+let html5QrCode = null;
+let scannerRunning = false;
+let scanProcessing = false;
 
 
 // CHECK TEACHER SESSION
@@ -281,7 +415,6 @@ async function checkTeacher() {
     "teacherEmailDisplay"
   ).textContent =
     session.user.email || "Authorised teacher";
-
 }
 
 
@@ -382,7 +515,7 @@ document.getElementById("studentForm")
     }
 
 
-    // VERIFY TEACHER ROLE AGAIN
+    // VERIFY TEACHER ROLE
 
     const { data: roleData, error: roleError } =
       await supabase
@@ -398,7 +531,7 @@ document.getElementById("studentForm")
     }
 
 
-    // CALL EDGE FUNCTION WITH ACCESS TOKEN
+    // CALL CREATE-STUDENT FUNCTION
 
     const { data, error } =
       await supabase.functions.invoke(
@@ -418,21 +551,15 @@ document.getElementById("studentForm")
       );
 
 
-    // SHOW REAL FUNCTION ERROR
-
     if (error) {
 
       let details = null;
 
       try {
-
         if (error.context) {
           details = await error.context.json();
         }
-
-      } catch (_) {
-        // Response may not contain JSON.
-      }
+      } catch (_) {}
 
       console.error(
         "Student registration response:",
@@ -445,11 +572,8 @@ document.getElementById("studentForm")
         error.message ||
         "Student registration failed."
       );
-
     }
 
-
-    // CHECK FUNCTION RESPONSE
 
     const student = data?.student;
 
@@ -482,8 +606,6 @@ document.getElementById("studentForm")
       }
     );
 
-
-    // SHOW SUCCESS
 
     document.getElementById("qrResult").hidden = false;
 
@@ -531,9 +653,7 @@ document.getElementById("printQrButton")
     window.open("", "_blank");
 
   if (!printWindow) {
-
     alert("Please allow pop-ups to print the QR code.");
-
     return;
   }
 
@@ -584,18 +704,262 @@ function escapeHtml(value) {
 }
 
 
+// SHOW SCAN MESSAGE
+
+function showScanMessage(message, type = "") {
+
+  scanMessage.textContent = message;
+
+  scanMessage.className = "scan-message";
+
+  if (type) {
+    scanMessage.classList.add(type);
+  }
+
+}
+
+
+// STOP QR SCANNER
+
+async function stopScanner() {
+
+  if (html5QrCode && scannerRunning) {
+
+    try {
+      await html5QrCode.stop();
+    } catch (error) {
+      console.warn("Scanner stop:", error);
+    }
+
+    scannerRunning = false;
+  }
+
+  document.getElementById(
+    "startScannerButton"
+  ).disabled = false;
+
+  document.getElementById(
+    "stopScannerButton"
+  ).disabled = true;
+
+}
+
+
+// START QR SCANNER
+
+document.getElementById("startScannerButton")
+.addEventListener("click", async () => {
+
+  const startButton =
+    document.getElementById("startScannerButton");
+
+  const stopButton =
+    document.getElementById("stopScannerButton");
+
+  startButton.disabled = true;
+
+  showScanMessage(
+    "Starting camera... Please allow camera access."
+  );
+
+  try {
+
+    if (!html5QrCode) {
+      html5QrCode = new Html5Qrcode("reader");
+    }
+
+    await html5QrCode.start(
+
+      { facingMode: "environment" },
+
+      {
+        fps: 10,
+        qrbox: {
+          width: 250,
+          height: 250
+        }
+      },
+
+      async (decodedText) => {
+
+        if (scanProcessing) return;
+
+        scanProcessing = true;
+
+        // Stop after reading one QR code
+        await stopScanner();
+
+        await recordAttendance(decodedText);
+
+        scanProcessing = false;
+
+      },
+
+      () => {
+        // Normal scanning frames may have no QR code.
+      }
+
+    );
+
+    scannerRunning = true;
+
+    stopButton.disabled = false;
+
+    showScanMessage(
+      "Camera is active. Point it at a student's QR code."
+    );
+
+  } catch (error) {
+
+    console.error("QR scanner error:", error);
+
+    startButton.disabled = false;
+
+    stopButton.disabled = true;
+
+    showScanMessage(
+      "Could not start camera. Check camera permission and try again.",
+      "error"
+    );
+
+  }
+
+});
+
+
+// STOP BUTTON
+
+document.getElementById("stopScannerButton")
+.addEventListener("click", async () => {
+
+  await stopScanner();
+
+  showScanMessage("Scanner stopped.");
+
+});
+
+
+// RECORD ATTENDANCE
+
+async function recordAttendance(qrToken) {
+
+  showScanMessage(
+    "QR code detected. Recording attendance..."
+  );
+
+  try {
+
+    // GET TEACHER SESSION
+
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    const session = sessionData.session;
+
+    if (!session || !session.access_token) {
+      throw new Error(
+        "Your teacher session has expired. Please sign in again."
+      );
+    }
+
+
+    // VERIFY TEACHER ROLE
+
+    const { data: roleData, error: roleError } =
+      await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+    if (roleError) throw roleError;
+
+    if (roleData?.role !== "teacher") {
+      throw new Error("Teacher access required.");
+    }
+
+
+    // CALL MARK-ATTENDANCE EDGE FUNCTION
+
+    const { data, error } =
+      await supabase.functions.invoke(
+        "mark-attendance",
+        {
+          body: {
+            qr_token: qrToken
+          },
+
+          headers: {
+            Authorization:
+              `Bearer ${session.access_token}`
+          }
+        }
+      );
+
+
+    if (error) {
+
+      let details = null;
+
+      try {
+        if (error.context) {
+          details = await error.context.json();
+        }
+      } catch (_) {}
+
+      console.error(
+        "Attendance response:",
+        details || error
+      );
+
+      throw new Error(
+        details?.error ||
+        details?.detail?.message ||
+        error.message ||
+        "Could not record attendance."
+      );
+    }
+
+
+    if (data?.error) {
+      throw new Error(data.error);
+    }
+
+
+    showScanMessage(
+      data?.message ||
+      "Attendance recorded successfully!",
+      "success"
+    );
+
+  } catch (error) {
+
+    console.error("Attendance error:", error);
+
+    showScanMessage(
+      error.message || "Attendance recording failed.",
+      "error"
+    );
+
+  }
+
+}
+
+
 // LOGOUT
 
 document.getElementById("logoutButton")
 .addEventListener("click", async () => {
 
+  await stopScanner();
+
   const { error } =
     await supabase.auth.signOut();
 
   if (error) {
-
     alert("Could not sign out. Please try again.");
-
     return;
   }
 
