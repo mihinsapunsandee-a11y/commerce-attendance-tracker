@@ -257,14 +257,16 @@
             });
 
           if (error) throw error;
-          if (!data || !data.qr_token) {
-            throw new Error("Student was created, but QR data was not returned.");
-          }
+       const student = data?.student;
 
-          document.getElementById("registeredStudentName").textContent =
-            data.full_name + " · " + data.admission_number;
+if (!student || !student.qr_token) {
+  throw new Error("Student details were not returned.");
+}
 
-          const canvas = document.getElementById("qrCanvas");
+document.getElementById("registeredStudentName").textContent =
+  student.full_name + " · " + student.admission_number;
+
+const canvas = document.getElementById("qrCanvas");
 
           await QRCode.toCanvas(canvas, data.qr_token, {
             width: 240,
