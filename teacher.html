@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teacher Portal | Commerce Attendance Tracker</title>
   <link rel="stylesheet" href="styles.css">
+
   <style>
     .tool-section { margin-top: 24px; }
     .tool-section input { margin-bottom: 12px; }
@@ -26,331 +27,603 @@
     .qr-result[hidden] { display: none; }
   </style>
 </head>
+
 <body>
-  <header class="topbar">
-    <a class="brand-small" href="index.html">
-      <span class="brand-mark small">EC</span>
-      <span>Commerce Attendance Tracker
-        <small>R / Eheliyagoda Central College</small>
-      </span>
-    </a>
-    <span class="portal-label">TEACHER PORTAL</span>
-  </header>
 
-  <main class="dashboard-wrap narrow">
+<header class="topbar">
+  <a class="brand-small" href="index.html">
+    <span class="brand-mark small">EC</span>
+    <span>
+      Commerce Attendance Tracker
+      <small>R / Eheliyagoda Central College</small>
+    </span>
+  </a>
+  <span class="portal-label">TEACHER PORTAL</span>
+</header>
 
-    <section id="loginSection">
-      <p class="eyebrow dark">AUTHORISED STAFF</p>
-      <h1>Teacher portal</h1>
-      <p class="muted">Sign in using your authorised teacher account.</p>
+<main class="dashboard-wrap narrow">
 
-      <section class="panel">
-        <form id="teacherLoginForm">
-          <label for="teacherEmail">Teacher email</label>
-          <input id="teacherEmail" type="email"
-            placeholder="Enter your teacher email"
-            autocomplete="username" required>
+  <!-- TEACHER LOGIN -->
+  <section id="loginSection">
+    <p class="eyebrow dark">AUTHORISED STAFF</p>
+    <h1>Teacher portal</h1>
+    <p class="muted">
+      Sign in using your authorised teacher account.
+    </p>
 
-          <label for="teacherPassword">Password</label>
-          <input id="teacherPassword" type="password"
-            placeholder="Enter your password"
-            autocomplete="current-password" required>
+    <section class="panel">
+      <form id="teacherLoginForm">
 
-          <button class="primary-btn" id="loginButton" type="submit">
-            Sign in
+        <label for="teacherEmail">Teacher email</label>
+        <input
+          id="teacherEmail"
+          type="email"
+          placeholder="Enter your teacher email"
+          autocomplete="username"
+          required
+        >
+
+        <label for="teacherPassword">Password</label>
+        <input
+          id="teacherPassword"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button class="primary-btn" id="loginButton" type="submit">
+          Sign in
+        </button>
+
+        <p id="loginMessage" class="form-message" role="status"></p>
+
+      </form>
+    </section>
+  </section>
+
+  <!-- TEACHER DASHBOARD -->
+  <section id="teacherSection" hidden>
+
+    <p class="eyebrow dark">AUTHORISED STAFF</p>
+    <h1>Teacher portal</h1>
+    <p class="muted">Commerce Attendance Tracker · Grade 12</p>
+
+    <section class="panel">
+
+      <h2>Welcome, Teacher</h2>
+      <p class="muted" id="teacherEmailDisplay"></p>
+
+      <!-- STUDENT REGISTRATION -->
+      <div class="tool-section">
+
+        <h3>Register a New Student</h3>
+
+        <p class="muted">
+          Create a student account and generate their unique QR code.
+        </p>
+
+        <form id="studentForm">
+
+          <label for="admissionNumber">Admission Number</label>
+          <input
+            id="admissionNumber"
+            type="text"
+            placeholder="Enter admission number"
+            required
+          >
+
+          <label for="fullName">Student Full Name</label>
+          <input
+            id="fullName"
+            type="text"
+            placeholder="Enter student's full name"
+            required
+          >
+
+          <label for="studentPassword">Student Password</label>
+          <input
+            id="studentPassword"
+            type="password"
+            placeholder="Create a password (minimum 8 characters)"
+            minlength="8"
+            maxlength="128"
+            required
+          >
+
+          <button
+            class="primary-btn"
+            id="createStudentButton"
+            type="submit"
+          >
+            Create Student Account
           </button>
 
-          <p id="loginMessage" class="form-message" role="status"></p>
+          <p id="studentMessage" class="form-message" role="status"></p>
+
         </form>
-      </section>
-    </section>
 
-    <section id="teacherSection" hidden>
-      <p class="eyebrow dark">AUTHORISED STAFF</p>
-      <h1>Teacher portal</h1>
-      <p class="muted">Commerce Attendance Tracker · Grade 12</p>
+        <!-- QR RESULT -->
+        <div id="qrResult" class="qr-result" hidden>
 
-      <section class="panel">
-        <h2>Welcome, Teacher</h2>
-        <p class="muted" id="teacherEmailDisplay"></p>
+          <h3>Student Registered Successfully</h3>
 
-        <div class="tool-section">
-          <h3>Register a New Student</h3>
+          <p id="registeredStudentName"></p>
+
           <p class="muted">
-            Create a student account and generate their unique QR code.
+            Student's unique attendance QR code
           </p>
 
-          <form id="studentForm">
-            <label for="admissionNumber">Admission Number</label>
-            <input id="admissionNumber" type="text"
-              placeholder="Enter admission number" required>
+          <canvas id="qrCanvas"></canvas>
 
-            <label for="fullName">Student Full Name</label>
-            <input id="fullName" type="text"
-              placeholder="Enter student's full name" required>
+          <p class="muted">
+            Save or print this QR code and give it to the student.
+          </p>
 
-            <label for="studentPassword">Student Password</label>
-            <input id="studentPassword" type="password"
-              placeholder="Create a password (minimum 8 characters)"
-              minlength="8" maxlength="128" required>
+          <button
+            class="primary-btn"
+            id="printQrButton"
+            type="button"
+          >
+            Print QR Code
+          </button>
 
-            <button class="primary-btn" id="createStudentButton"
-              type="submit">
-              Create Student Account
-            </button>
-
-            <p id="studentMessage" class="form-message" role="status"></p>
-          </form>
-
-          <div id="qrResult" class="qr-result" hidden>
-            <h3>Student Registered Successfully</h3>
-            <p id="registeredStudentName"></p>
-            <p class="muted">Student's unique attendance QR code</p>
-            <canvas id="qrCanvas"></canvas>
-            <p class="muted">
-              Save or print this QR code and give it to the student.
-            </p>
-            <button class="primary-btn" id="printQrButton" type="button">
-              Print QR Code
-            </button>
-          </div>
         </div>
 
-        <hr>
+      </div>
 
-        <h3>Other Teacher Tools</h3>
-        <ul class="feature-list">
-          <li>View registered Commerce students</li>
-          <li>Scan student QR IDs to record attendance</li>
-          <li>Review attendance and correct mistakes</li>
-          <li>Manage registered school days</li>
-        </ul>
+      <hr>
 
-        <button class="primary-btn" id="logoutButton" type="button">
-          Sign out
-        </button>
-      </section>
+      <h3>Other Teacher Tools</h3>
+
+      <ul class="feature-list">
+        <li>View registered Commerce students</li>
+        <li>Scan student QR IDs to record attendance</li>
+        <li>Review attendance and correct mistakes</li>
+        <li>Manage registered school days</li>
+      </ul>
+
+      <button
+        class="primary-btn"
+        id="logoutButton"
+        type="button"
+      >
+        Sign out
+      </button>
+
     </section>
-  </main>
+  </section>
 
-  <script type="module">
-    import { createClient } from
-      "https://esm.sh/@supabase/supabase-js@2";
-    import QRCode from "https://esm.sh/qrcode@1.5.4";
+</main>
 
-    const SUPABASE_URL =
-      "https://rnbgggtivkdytccpzvsg.supabase.co";
+<script type="module">
 
-    const SUPABASE_PUBLISHABLE_KEY =
-      "sb_publishable_Q0gvzQVL7njaiPGlsafH0g_1SA5qrZt";
+import { createClient } from
+  "https://esm.sh/@supabase/supabase-js@2";
 
-    const supabase = createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
+import QRCode from
+  "https://esm.sh/qrcode@1.5.4";
 
-    const loginSection = document.getElementById("loginSection");
-    const teacherSection = document.getElementById("teacherSection");
-    const loginMessage = document.getElementById("loginMessage");
-    const studentMessage = document.getElementById("studentMessage");
 
-    async function checkTeacher() {
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
+// SUPABASE CONFIGURATION
 
-      if (sessionError) throw sessionError;
+const SUPABASE_URL =
+  "https://rnbgggtivkdytccpzvsg.supabase.co";
 
-      const session = sessionData.session;
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_Q0gvzQVL7njaiPGlsafH0g_1SA5qrZt";
 
-      if (!session) {
-        loginSection.hidden = false;
-        teacherSection.hidden = true;
-        return;
-      }
 
-      const { data: roleData, error: roleError } =
-        await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .maybeSingle();
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 
-      if (roleError) throw roleError;
 
-      if (roleData?.role !== "teacher") {
-        await supabase.auth.signOut();
-        loginSection.hidden = false;
-        teacherSection.hidden = true;
-        loginMessage.textContent = "Teacher access required.";
-        return;
-      }
+// PAGE ELEMENTS
 
-      loginSection.hidden = true;
-      teacherSection.hidden = false;
+const loginSection =
+  document.getElementById("loginSection");
 
-      document.getElementById("teacherEmailDisplay").textContent =
-        session.user.email || "Authorised teacher";
-    }
+const teacherSection =
+  document.getElementById("teacherSection");
 
-    document.getElementById("teacherLoginForm")
-      .addEventListener("submit", async (event) => {
-        event.preventDefault();
+const loginMessage =
+  document.getElementById("loginMessage");
 
-        const email =
-          document.getElementById("teacherEmail").value.trim();
-        const password =
-          document.getElementById("teacherPassword").value;
-        const button = document.getElementById("loginButton");
+const studentMessage =
+  document.getElementById("studentMessage");
 
-        button.disabled = true;
-        loginMessage.textContent = "Checking teacher account...";
 
-        try {
-          const { error } =
-            await supabase.auth.signInWithPassword({ email, password });
+// CHECK TEACHER SESSION
 
-          if (error) throw error;
+async function checkTeacher() {
 
-          await checkTeacher();
+  const { data, error } =
+    await supabase.auth.getSession();
 
-          if (!teacherSection.hidden) {
-            loginMessage.textContent = "";
-          }
-        } catch (error) {
-          console.error("Teacher login error:", error);
-          loginMessage.textContent =
-            error.message || "Could not sign in.";
-        } finally {
-          button.disabled = false;
-        }
-      });
+  if (error) throw error;
 
-    document.getElementById("studentForm")
-      .addEventListener("submit", async (event) => {
-        event.preventDefault();
+  const session = data.session;
 
-        const button =
-          document.getElementById("createStudentButton");
+  if (!session) {
+    loginSection.hidden = false;
+    teacherSection.hidden = true;
+    return;
+  }
 
-        const admission_number =
-          document.getElementById("admissionNumber").value.trim();
+  const { data: roleData, error: roleError } =
+    await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .maybeSingle();
 
-        const full_name =
-          document.getElementById("fullName").value.trim();
+  if (roleError) throw roleError;
 
-        const password =
-          document.getElementById("studentPassword").value;
+  if (roleData?.role !== "teacher") {
 
-        button.disabled = true;
-        studentMessage.textContent = "Creating student account...";
+    await supabase.auth.signOut();
 
-        document.getElementById("qrResult").hidden = true;
+    loginSection.hidden = false;
+    teacherSection.hidden = true;
 
-        try {
-          const { data, error } =
-            await supabase.functions.invoke("create-student", {
-              body: {
-                admission_number,
-                full_name,
-                password
-              }
-            });
+    loginMessage.textContent =
+      "Teacher access required.";
 
-          if (error) throw error;
-       const student = data?.student;
+    return;
+  }
 
-if (!student || !student.qr_token) {
-  throw new Error("Student details were not returned.");
+  loginSection.hidden = true;
+  teacherSection.hidden = false;
+
+  document.getElementById(
+    "teacherEmailDisplay"
+  ).textContent =
+    session.user.email || "Authorised teacher";
+
 }
 
-document.getElementById("registeredStudentName").textContent =
-  student.full_name + " · " + student.admission_number;
 
-const canvas = document.getElementById("qrCanvas");
+// TEACHER LOGIN
 
-          await QRCode.toCanvas(canvas, data.qr_token, {
-            width: 240,
-            margin: 2,
-            errorCorrectionLevel: "H"
-          });
+document.getElementById("teacherLoginForm")
+.addEventListener("submit", async (event) => {
 
-          document.getElementById("qrResult").hidden = false;
-          studentMessage.textContent =
-            "Student account created successfully.";
+  event.preventDefault();
 
-          document.getElementById("studentForm").reset();
+  const email =
+    document.getElementById("teacherEmail").value.trim();
 
-        } catch (error) {
-          console.error("Student registration error:", error);
-          studentMessage.textContent =
-            error.message || "Could not create student account.";
-        } finally {
-          button.disabled = false;
-        }
+  const password =
+    document.getElementById("teacherPassword").value;
+
+  const button =
+    document.getElementById("loginButton");
+
+  button.disabled = true;
+
+  loginMessage.textContent =
+    "Checking teacher account...";
+
+  try {
+
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password
       });
 
-    document.getElementById("printQrButton")
-      .addEventListener("click", () => {
-        const canvas = document.getElementById("qrCanvas");
-        const image = canvas.toDataURL("image/png");
-        const name =
-          document.getElementById("registeredStudentName").textContent;
+    if (error) throw error;
 
-        const printWindow = window.open("", "_blank");
+    await checkTeacher();
 
-        if (!printWindow) {
-          alert("Please allow pop-ups to print the QR code.");
-          return;
-        }
-
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-          <head><title>Student QR Code</title></head>
-          <body style="font-family:Arial;text-align:center;padding:30px">
-            <h2>Commerce Attendance Tracker</h2>
-            <p>${escapeHtml(name)}</p>
-            <img src="${image}" width="240" height="240">
-            <p>R / Eheliyagoda Central College</p>
-            <script>
-              window.onload = () => window.print();
-            <\/script>
-          </body>
-          </html>
-        `);
-        printWindow.document.close();
-      });
-
-    function escapeHtml(value) {
-      return value.replace(/[&<>"']/g, char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[char]);
+    if (!teacherSection.hidden) {
+      loginMessage.textContent = "";
     }
 
-    document.getElementById("logoutButton")
-      .addEventListener("click", async () => {
-        const { error } = await supabase.auth.signOut();
+  } catch (error) {
 
-        if (error) {
-          alert("Could not sign out. Please try again.");
-          return;
+    console.error("Teacher login error:", error);
+
+    loginMessage.textContent =
+      error.message || "Could not sign in.";
+
+  } finally {
+
+    button.disabled = false;
+
+  }
+
+});
+
+
+// STUDENT REGISTRATION
+
+document.getElementById("studentForm")
+.addEventListener("submit", async (event) => {
+
+  event.preventDefault();
+
+  const button =
+    document.getElementById("createStudentButton");
+
+  const admission_number =
+    document.getElementById("admissionNumber").value.trim();
+
+  const full_name =
+    document.getElementById("fullName").value.trim();
+
+  const password =
+    document.getElementById("studentPassword").value;
+
+  button.disabled = true;
+
+  studentMessage.textContent =
+    "Creating student account...";
+
+  document.getElementById("qrResult").hidden = true;
+
+  try {
+
+    // GET CURRENT TEACHER SESSION
+
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    const session = sessionData.session;
+
+    if (!session || !session.access_token) {
+      throw new Error(
+        "Teacher session expired. Please sign in again."
+      );
+    }
+
+
+    // VERIFY TEACHER ROLE AGAIN
+
+    const { data: roleData, error: roleError } =
+      await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+    if (roleError) throw roleError;
+
+    if (roleData?.role !== "teacher") {
+      throw new Error("Teacher access required.");
+    }
+
+
+    // CALL EDGE FUNCTION WITH ACCESS TOKEN
+
+    const { data, error } =
+      await supabase.functions.invoke(
+        "create-student",
+        {
+          body: {
+            admission_number,
+            full_name,
+            password
+          },
+
+          headers: {
+            Authorization:
+              `Bearer ${session.access_token}`
+          }
+        }
+      );
+
+
+    // SHOW REAL FUNCTION ERROR
+
+    if (error) {
+
+      let details = null;
+
+      try {
+
+        if (error.context) {
+          details = await error.context.json();
         }
 
-        teacherSection.hidden = true;
-        loginSection.hidden = false;
-        document.getElementById("teacherLoginForm").reset();
-        loginMessage.textContent = "You have signed out.";
-      });
+      } catch (_) {
+        // Response may not contain JSON.
+      }
 
-    checkTeacher().catch(error => {
-      console.error("Teacher access error:", error);
-      loginMessage.textContent =
-        "Could not verify teacher access. Please try again.";
-    });
-  </script>
+      console.error(
+        "Student registration response:",
+        details || error
+      );
+
+      throw new Error(
+        details?.error ||
+        details?.detail?.message ||
+        error.message ||
+        "Student registration failed."
+      );
+
+    }
+
+
+    // CHECK FUNCTION RESPONSE
+
+    const student = data?.student;
+
+    if (!student || !student.qr_token) {
+      throw new Error(
+        data?.error || "Student details were not returned."
+      );
+    }
+
+
+    // GENERATE QR CODE
+
+    document.getElementById(
+      "registeredStudentName"
+    ).textContent =
+      student.full_name +
+      " · " +
+      student.admission_number;
+
+    const canvas =
+      document.getElementById("qrCanvas");
+
+    await QRCode.toCanvas(
+      canvas,
+      student.qr_token,
+      {
+        width: 240,
+        margin: 2,
+        errorCorrectionLevel: "H"
+      }
+    );
+
+
+    // SHOW SUCCESS
+
+    document.getElementById("qrResult").hidden = false;
+
+    studentMessage.textContent =
+      "Student account created successfully.";
+
+    document.getElementById("studentForm").reset();
+
+  } catch (error) {
+
+    console.error(
+      "Student registration error:",
+      error
+    );
+
+    studentMessage.textContent =
+      error.message || "Could not create student account.";
+
+  } finally {
+
+    button.disabled = false;
+
+  }
+
+});
+
+
+// PRINT QR CODE
+
+document.getElementById("printQrButton")
+.addEventListener("click", () => {
+
+  const canvas =
+    document.getElementById("qrCanvas");
+
+  const image =
+    canvas.toDataURL("image/png");
+
+  const name =
+    document.getElementById(
+      "registeredStudentName"
+    ).textContent;
+
+  const printWindow =
+    window.open("", "_blank");
+
+  if (!printWindow) {
+
+    alert("Please allow pop-ups to print the QR code.");
+
+    return;
+  }
+
+  const safeName = escapeHtml(name);
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Student QR Code</title>
+    </head>
+
+    <body style="font-family:Arial;text-align:center;padding:30px">
+
+      <h2>Commerce Attendance Tracker</h2>
+
+      <p>${safeName}</p>
+
+      <img src="${image}" width="240" height="240">
+
+      <p>R / Eheliyagoda Central College</p>
+
+      <script>
+        window.onload = () => window.print();
+      <\/script>
+
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+
+});
+
+
+// HTML ESCAPE
+
+function escapeHtml(value) {
+
+  return value.replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+
+}
+
+
+// LOGOUT
+
+document.getElementById("logoutButton")
+.addEventListener("click", async () => {
+
+  const { error } =
+    await supabase.auth.signOut();
+
+  if (error) {
+
+    alert("Could not sign out. Please try again.");
+
+    return;
+  }
+
+  teacherSection.hidden = true;
+  loginSection.hidden = false;
+
+  document.getElementById(
+    "teacherLoginForm"
+  ).reset();
+
+  loginMessage.textContent =
+    "You have signed out.";
+
+});
+
+
+// INITIAL CHECK
+
+checkTeacher().catch(error => {
+
+  console.error("Teacher access error:", error);
+
+  loginMessage.textContent =
+    "Could not verify teacher access. Please try again.";
+
+});
+
+</script>
+
 </body>
 </html>
