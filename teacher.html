@@ -8,14 +8,8 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
-    .tool-section {
-      margin-top: 24px;
-    }
-
-    .form-message {
-      margin-top: 12px;
-    }
-
+    .tool-section { margin-top: 24px; }
+    .form-message { margin-top: 12px; }
     .qr-result {
       margin-top: 20px;
       padding: 20px;
@@ -24,17 +18,12 @@
       text-align: center;
       background: #fff;
     }
-
     .qr-result canvas {
       display: block;
       margin: 16px auto;
       max-width: 100%;
     }
-
-    .qr-result[hidden] {
-      display: none;
-    }
-
+    .qr-result[hidden] { display: none; }
     .scanner-box {
       margin: 18px 0;
       padding: 18px;
@@ -42,29 +31,19 @@
       border-radius: 12px;
       background: #fff;
     }
-
     #reader {
       width: 100%;
       max-width: 450px;
       margin: 18px auto;
     }
-
-    #reader video {
-      border-radius: 10px;
-    }
-
+    #reader video { border-radius: 10px; }
     .scanner-buttons {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       margin-top: 15px;
     }
-
-    .scanner-buttons button {
-      flex: 1;
-      min-width: 130px;
-    }
-
+    .scanner-buttons button { flex: 1; min-width: 130px; }
     .scan-message {
       padding: 12px;
       margin-top: 15px;
@@ -72,17 +51,8 @@
       background: #f3f6fa;
       overflow-wrap: anywhere;
     }
-
-    .scan-message.success {
-      background: #e8f7ed;
-      color: #176b37;
-    }
-
-    .scan-message.error {
-      background: #fff0f0;
-      color: #a32121;
-    }
-
+    .scan-message.success { background: #e8f7ed; color: #176b37; }
+    .scan-message.error { background: #fff0f0; color: #a32121; }
     .secondary-btn {
       padding: 12px 18px;
       border: 1px solid #183b63;
@@ -92,18 +62,12 @@
       font-weight: 600;
       cursor: pointer;
     }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
     .section-divider {
       margin: 28px 0;
       border: 0;
       border-top: 1px solid #dce4ed;
     }
-
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -117,20 +81,33 @@
       background: #fff;
     }
     .calendar-card h4 { margin: 0 0 12px; color: #183b63; }
-    .calendar-card label { display: block; margin: 10px 0 6px; font-weight: 600; }
+    .calendar-card label {
+      display: block;
+      margin: 10px 0 6px;
+      font-weight: 600;
+    }
     .calendar-card input, .calendar-card select {
-      width: 100%; box-sizing: border-box; margin-bottom: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 8px;
     }
     .calendar-list { margin-top: 12px; }
     .calendar-item {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 12px; padding: 12px 0; border-bottom: 1px solid #e5ebf2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5ebf2;
     }
     .calendar-item:last-child { border-bottom: 0; }
-    .calendar-item small { display: block; color: #68798d; margin-top: 4px; }
+    .calendar-item small {
+      display: block;
+      color: #68798d;
+      margin-top: 4px;
+    }
     .calendar-item button { flex-shrink: 0; }
     .calendar-status { margin-top: 10px; color: #68798d; }
-
   </style>
 </head>
 
@@ -144,242 +121,138 @@
       <small>R / Eheliyagoda Central College</small>
     </span>
   </a>
-
   <span class="portal-label">TEACHER PORTAL</span>
 </header>
-
 
 <main class="dashboard-wrap narrow">
 
   <!-- TEACHER LOGIN -->
-
   <section id="loginSection">
-
     <p class="eyebrow dark">AUTHORISED STAFF</p>
     <h1>Teacher portal</h1>
-
-    <p class="muted">
-      Sign in using your authorised teacher account.
-    </p>
+    <p class="muted">Sign in using your authorised teacher account.</p>
 
     <section class="panel">
-
       <form id="teacherLoginForm">
-
         <label for="teacherEmail">Teacher email</label>
-
-        <input
-          id="teacherEmail"
-          type="email"
+        <input id="teacherEmail" type="email"
           placeholder="Enter your teacher email"
-          autocomplete="username"
-          required
-        >
+          autocomplete="username" required>
 
         <label for="teacherPassword">Password</label>
-
-        <input
-          id="teacherPassword"
-          type="password"
+        <input id="teacherPassword" type="password"
           placeholder="Enter your password"
-          autocomplete="current-password"
-          required
-        >
+          autocomplete="current-password" required>
 
         <button class="primary-btn" id="loginButton" type="submit">
           Sign in
         </button>
-
         <p id="loginMessage" class="form-message" role="status"></p>
-
       </form>
-
     </section>
   </section>
 
-
-
   <!-- TEACHER DASHBOARD -->
-
   <section id="teacherSection" hidden>
-
     <p class="eyebrow dark">AUTHORISED STAFF</p>
-
     <h1>Teacher portal</h1>
-
-    <p class="muted">
-      Commerce Attendance Tracker · Grade 12
-    </p>
-
+    <p class="muted">Commerce Attendance Tracker · Grade 12</p>
 
     <section class="panel">
-
       <h2>Welcome, Teacher</h2>
-
       <p class="muted" id="teacherEmailDisplay"></p>
 
-
-      <!-- QR SCANNER - SHOWN FIRST -->
-
+      <!-- QR SCANNER -->
       <div class="tool-section">
-
         <h3>Scan Student QR Code</h3>
-
-        <p class="muted">
-          Scan a registered student's QR code to record attendance.
-        </p>
+        <p class="muted">Scan a registered student's QR code to record attendance.</p>
 
         <div class="scanner-box">
-
           <div id="reader"></div>
 
           <div class="scanner-buttons">
-
-            <button
-              class="primary-btn"
-              id="startScannerButton"
-              type="button"
-            >
+            <button class="primary-btn" id="startScannerButton" type="button">
               Start Scanner
             </button>
-
-            <button
-              class="secondary-btn"
-              id="stopScannerButton"
-              type="button"
-              disabled
-            >
+            <button class="secondary-btn" id="stopScannerButton"
+              type="button" disabled>
               Stop Scanner
             </button>
-
           </div>
 
-          <p
-            id="scanMessage"
-            class="scan-message"
-            role="status"
-            aria-live="polite"
-          >
+          <p id="scanMessage" class="scan-message" role="status" aria-live="polite">
             Press Start Scanner to begin.
           </p>
-
         </div>
-
       </div>
 
-
       <hr class="section-divider">
-
 
       <!-- STUDENT REGISTRATION -->
-
       <div class="tool-section">
-
         <h3>Register a New Student</h3>
-
-        <p class="muted">
-          Create a student account and generate their unique QR code.
-        </p>
+        <p class="muted">Create a student account and generate their unique QR code.</p>
 
         <form id="studentForm">
-
           <label for="admissionNumber">Admission Number</label>
-
-          <input
-            id="admissionNumber"
-            type="text"
-            placeholder="Enter admission number"
-            required
-          >
+          <input id="admissionNumber" type="text"
+            placeholder="Enter admission number" required>
 
           <label for="fullName">Student Full Name</label>
-
-          <input
-            id="fullName"
-            type="text"
-            placeholder="Enter student's full name"
-            required
-          >
+          <input id="fullName" type="text"
+            placeholder="Enter student's full name" required>
 
           <label for="studentPassword">Student Password</label>
-
-          <input
-            id="studentPassword"
-            type="password"
+          <input id="studentPassword" type="password"
             placeholder="Create a password (minimum 8 characters)"
-            minlength="8"
-            maxlength="128"
-            required
-          >
+            minlength="8" maxlength="128" required>
 
-          <button
-            class="primary-btn"
-            id="createStudentButton"
-            type="submit"
-          >
+          <button class="primary-btn" id="createStudentButton" type="submit">
             Create Student Account
           </button>
-
           <p id="studentMessage" class="form-message" role="status"></p>
-
         </form>
 
-
-        <!-- GENERATED QR CODE -->
-
         <div id="qrResult" class="qr-result" hidden>
-
           <h3>Student Registered Successfully</h3>
-
           <p id="registeredStudentName"></p>
-
-          <p class="muted">
-            Student's unique attendance QR code
-          </p>
-
+          <p class="muted">Student's unique attendance QR code</p>
           <canvas id="qrCanvas"></canvas>
-
-          <p class="muted">
-            Save or print this QR code and give it to the student.
-          </p>
-
-          <button
-            class="primary-btn"
-            id="printQrButton"
-            type="button"
-          >
+          <p class="muted">Save or print this QR code and give it to the student.</p>
+          <button class="primary-btn" id="printQrButton" type="button">
             Print QR Code
           </button>
-
         </div>
-
       </div>
 
-
       <hr class="section-divider">
-
-
 
       <!-- SCHOOL CALENDAR MANAGEMENT -->
-      <hr class="section-divider">
-
       <div class="tool-section" id="calendarManagement">
         <h3>School Calendar Management</h3>
         <p class="muted">
-          Manage academic years, school terms and holidays. Students will be able to view this calendar from their dashboard.
+          Manage academic years, school terms and holidays.
+          Students can view this calendar from their dashboard.
         </p>
 
         <div class="calendar-grid">
+
           <div class="calendar-card">
             <h4>Add Academic Year</h4>
             <form id="academicYearForm">
               <label for="yearName">Academic year</label>
-              <input id="yearName" type="text" placeholder="e.g. 2026" required maxlength="20">
+              <input id="yearName" type="text"
+                placeholder="e.g. 2026" required maxlength="20">
+
               <label for="yearStartDate">Start date</label>
               <input id="yearStartDate" type="date" required>
+
               <label for="yearEndDate">End date</label>
               <input id="yearEndDate" type="date" required>
-              <button class="primary-btn" id="saveYearButton" type="submit">Save Academic Year</button>
+
+              <button class="primary-btn" id="saveYearButton" type="submit">
+                Save Academic Year
+              </button>
             </form>
             <p class="form-message" id="yearMessage" role="status"></p>
           </div>
@@ -391,6 +264,7 @@
               <select id="termYear" required>
                 <option value="">Select academic year</option>
               </select>
+
               <label for="termName">Term name</label>
               <select id="termName" required>
                 <option value="">Select term</option>
@@ -398,11 +272,16 @@
                 <option value="Term 2">Term 2</option>
                 <option value="Term 3">Term 3</option>
               </select>
+
               <label for="termStartDate">Start date</label>
               <input id="termStartDate" type="date" required>
+
               <label for="termEndDate">End date</label>
               <input id="termEndDate" type="date" required>
-              <button class="primary-btn" id="saveTermButton" type="submit">Save Term</button>
+
+              <button class="primary-btn" id="saveTermButton" type="submit">
+                Save Term
+              </button>
             </form>
             <p class="form-message" id="termMessage" role="status"></p>
           </div>
@@ -414,10 +293,14 @@
               <select id="holidayYear">
                 <option value="">Not linked to a year</option>
               </select>
+
               <label for="holidayName">Holiday name</label>
-              <input id="holidayName" type="text" placeholder="e.g. Public Holiday" required maxlength="100">
+              <input id="holidayName" type="text"
+                placeholder="e.g. Public Holiday" required maxlength="100">
+
               <label for="holidayDate">Holiday date</label>
               <input id="holidayDate" type="date" required>
+
               <label for="holidayType">Holiday type</label>
               <select id="holidayType" required>
                 <option value="Public Holiday">Public Holiday</option>
@@ -425,10 +308,44 @@
                 <option value="Special Holiday">Special Holiday</option>
                 <option value="Other">Other</option>
               </select>
-              <button class="primary-btn" id="saveHolidayButton" type="submit">Save Holiday</button>
+
+              <button class="primary-btn" id="saveHolidayButton" type="submit">
+                Save Holiday
+              </button>
             </form>
             <p class="form-message" id="holidayMessage" role="status"></p>
           </div>
+        </div>
+
+        <!-- SCHOOL DAY MANAGEMENT -->
+        <div class="calendar-card" style="margin-top:18px">
+          <h4>Manage School Days</h4>
+          <p class="muted">
+            Mark normal school days, special weekend school days,
+            and non-school days.
+          </p>
+
+          <form id="schoolDayForm">
+            <label for="schoolDayDate">Select date</label>
+            <input id="schoolDayDate" type="date" required>
+
+            <label for="schoolDayStatus">Day status</label>
+            <select id="schoolDayStatus" required>
+              <option value="school">School Day</option>
+              <option value="non-school">Non-school Day</option>
+            </select>
+
+            <button class="primary-btn" id="saveSchoolDayButton" type="submit">
+              Save School Day
+            </button>
+          </form>
+
+          <p id="schoolDayMessage" class="form-message" role="status"></p>
+
+          <hr class="section-divider">
+
+          <h4>Saved School Days</h4>
+          <div id="schoolDaysList" class="calendar-list">Loading...</div>
         </div>
 
         <div class="calendar-card" style="margin-top:18px">
@@ -449,11 +366,8 @@
         <p id="calendarLoadMessage" class="calendar-status" role="status"></p>
       </div>
 
-
-            <!-- OTHER TOOLS -->
-
+      <!-- OTHER TOOLS -->
       <h3>Other Teacher Tools</h3>
-
       <ul class="feature-list">
         <li>View registered Commerce students</li>
         <li>Scan student QR IDs to record attendance</li>
@@ -461,659 +375,46 @@
         <li>Manage registered school days</li>
       </ul>
 
-
-      <button
-        class="primary-btn"
-        id="logoutButton"
-        type="button"
-      >
+      <button class="primary-btn" id="logoutButton" type="button">
         Sign out
       </button>
-
     </section>
-
   </section>
-
 </main>
 
-
 <script type="module">
-
-import { createClient } from
-  "https://esm.sh/@supabase/supabase-js@2";
-
-import QRCode from
-  "https://esm.sh/qrcode@1.5.4";
-
-import { Html5Qrcode } from
-  "https://esm.sh/html5-qrcode@2.3.8";
-
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import QRCode from "https://esm.sh/qrcode@1.5.4";
+import { Html5Qrcode } from "https://esm.sh/html5-qrcode@2.3.8";
 
 // SUPABASE CONFIGURATION
+const SUPABASE_URL = "https://rnbgggtivkdytccpzvsg.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Q0gvzQVL7njaiPGlsafH0g_1SA5qrZt";
 
-const SUPABASE_URL =
-  "https://rnbgggtivkdytccpzvsg.supabase.co";
-
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_Q0gvzQVL7njaiPGlsafH0g_1SA5qrZt";
-
-
-const supabase = createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
-
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 // PAGE ELEMENTS
-
-const loginSection =
-  document.getElementById("loginSection");
-
-const teacherSection =
-  document.getElementById("teacherSection");
-
-const loginMessage =
-  document.getElementById("loginMessage");
-
-const studentMessage =
-  document.getElementById("studentMessage");
-
-const scanMessage =
-  document.getElementById("scanMessage");
-
+const loginSection = document.getElementById("loginSection");
+const teacherSection = document.getElementById("teacherSection");
+const loginMessage = document.getElementById("loginMessage");
+const studentMessage = document.getElementById("studentMessage");
+const scanMessage = document.getElementById("scanMessage");
+const calendarMessage = document.getElementById("calendarLoadMessage");
 
 // SCANNER VARIABLES
-
 let html5QrCode = null;
 let scannerRunning = false;
 let scanProcessing = false;
 
-
-// CHECK TEACHER SESSION
-
-async function checkTeacher() {
-
-  const { data, error } =
-    await supabase.auth.getSession();
-
-  if (error) throw error;
-
-  const session = data.session;
-
-  if (!session) {
-    loginSection.hidden = false;
-    teacherSection.hidden = true;
-    return;
-  }
-
-  const { data: roleData, error: roleError } =
-    await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", session.user.id)
-      .maybeSingle();
-
-  if (roleError) throw roleError;
-
-  if (roleData?.role !== "teacher") {
-
-    await supabase.auth.signOut();
-
-    loginSection.hidden = false;
-    teacherSection.hidden = true;
-
-    loginMessage.textContent =
-      "Teacher access required.";
-
-    return;
-  }
-
-  loginSection.hidden = true;
-  teacherSection.hidden = false;
-
-  document.getElementById(
-    "teacherEmailDisplay"
-  ).textContent =
-    session.user.email || "Authorised teacher";
-
-  await loadCalendarData();
-
-}
-
-
-// TEACHER LOGIN
-
-document.getElementById("teacherLoginForm")
-.addEventListener("submit", async (event) => {
-
-  event.preventDefault();
-
-  const email =
-    document.getElementById("teacherEmail").value.trim();
-
-  const password =
-    document.getElementById("teacherPassword").value;
-
-  const button =
-    document.getElementById("loginButton");
-
-  button.disabled = true;
-
-  loginMessage.textContent =
-    "Checking teacher account...";
-
-  try {
-
-    const { error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-    if (error) throw error;
-
-    await checkTeacher();
-
-    if (!teacherSection.hidden) {
-      loginMessage.textContent = "";
-    }
-
-  } catch (error) {
-
-    console.error("Teacher login error:", error);
-
-    loginMessage.textContent =
-      error.message || "Could not sign in.";
-
-  } finally {
-
-    button.disabled = false;
-
-  }
-
-});
-
-
-// STUDENT REGISTRATION
-
-document.getElementById("studentForm")
-.addEventListener("submit", async (event) => {
-
-  event.preventDefault();
-
-  const button =
-    document.getElementById("createStudentButton");
-
-  const admission_number =
-    document.getElementById("admissionNumber").value.trim();
-
-  const full_name =
-    document.getElementById("fullName").value.trim();
-
-  const password =
-    document.getElementById("studentPassword").value;
-
-  button.disabled = true;
-
-  studentMessage.textContent =
-    "Creating student account...";
-
-  document.getElementById("qrResult").hidden = true;
-
-  try {
-
-    const { data: sessionData, error: sessionError } =
-      await supabase.auth.getSession();
-
-    if (sessionError) throw sessionError;
-
-    const session = sessionData.session;
-
-    if (!session || !session.access_token) {
-      throw new Error(
-        "Teacher session expired. Please sign in again."
-      );
-    }
-
-
-    // VERIFY TEACHER ROLE
-
-    const { data: roleData, error: roleError } =
-      await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
-
-    if (roleError) throw roleError;
-
-    if (roleData?.role !== "teacher") {
-      throw new Error("Teacher access required.");
-    }
-
-
-    // CREATE STUDENT ACCOUNT
-
-    const { data, error } =
-      await supabase.functions.invoke(
-        "create-student",
-        {
-          body: {
-            admission_number,
-            full_name,
-            password
-          },
-
-          headers: {
-            Authorization:
-              `Bearer ${session.access_token}`
-          }
-        }
-      );
-
-
-    if (error) {
-
-      let details = null;
-
-      try {
-        if (error.context) {
-          details = await error.context.json();
-        }
-      } catch (_) {}
-
-      console.error(
-        "Student registration response:",
-        details || error
-      );
-
-      throw new Error(
-        details?.error ||
-        details?.detail?.message ||
-        error.message ||
-        "Student registration failed."
-      );
-    }
-
-
-    const student = data?.student;
-
-    if (!student || !student.qr_token) {
-      throw new Error(
-        data?.error || "Student details were not returned."
-      );
-    }
-
-
-    // GENERATE QR CODE
-
-    document.getElementById(
-      "registeredStudentName"
-    ).textContent =
-      student.full_name +
-      " · " +
-      student.admission_number;
-
-    const canvas =
-      document.getElementById("qrCanvas");
-
-    await QRCode.toCanvas(
-      canvas,
-      student.qr_token,
-      {
-        width: 240,
-        margin: 2,
-        errorCorrectionLevel: "H"
-      }
-    );
-
-
-    document.getElementById("qrResult").hidden = false;
-
-    studentMessage.textContent =
-      "Student account created successfully.";
-
-    document.getElementById("studentForm").reset();
-
-  } catch (error) {
-
-    console.error(
-      "Student registration error:",
-      error
-    );
-
-    studentMessage.textContent =
-      error.message || "Could not create student account.";
-
-  } finally {
-
-    button.disabled = false;
-
-  }
-
-});
-
-
-// PRINT QR CODE
-
-document.getElementById("printQrButton")
-.addEventListener("click", () => {
-
-  const canvas =
-    document.getElementById("qrCanvas");
-
-  const image =
-    canvas.toDataURL("image/png");
-
-  const name =
-    document.getElementById(
-      "registeredStudentName"
-    ).textContent;
-
-  const printWindow =
-    window.open("", "_blank");
-
-  if (!printWindow) {
-    alert("Please allow pop-ups to print the QR code.");
-    return;
-  }
-
-  const safeName = escapeHtml(name);
-
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Student QR Code</title>
-    </head>
-
-    <body style="font-family:Arial;text-align:center;padding:30px">
-
-      <h2>Commerce Attendance Tracker</h2>
-
-      <p>${safeName}</p>
-
-      <img src="${image}" width="240" height="240">
-
-      <p>R / Eheliyagoda Central College</p>
-
-      <script>
-        window.onload = () => window.print();
-      <\/script>
-
-    </body>
-    </html>
-  `);
-
-  printWindow.document.close();
-
-});
-
-
 // HTML ESCAPE
-
 function escapeHtml(value) {
-
-  return value.replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   })[char]);
-
 }
 
-
-// SHOW SCAN MESSAGE
-
-function showScanMessage(message, type = "") {
-
-  scanMessage.textContent = message;
-
-  scanMessage.className = "scan-message";
-
-  if (type) {
-    scanMessage.classList.add(type);
-  }
-
-}
-
-
-// STOP SCANNER
-
-async function stopScanner() {
-
-  if (html5QrCode && scannerRunning) {
-
-    try {
-      await html5QrCode.stop();
-    } catch (error) {
-      console.warn("Scanner stop:", error);
-    }
-
-    scannerRunning = false;
-  }
-
-  document.getElementById(
-    "startScannerButton"
-  ).disabled = false;
-
-  document.getElementById(
-    "stopScannerButton"
-  ).disabled = true;
-
-}
-
-
-// START SCANNER
-
-document.getElementById("startScannerButton")
-.addEventListener("click", async () => {
-
-  const startButton =
-    document.getElementById("startScannerButton");
-
-  const stopButton =
-    document.getElementById("stopScannerButton");
-
-  startButton.disabled = true;
-
-  showScanMessage(
-    "Starting camera... Please allow camera access."
-  );
-
-  try {
-
-    if (!html5QrCode) {
-      html5QrCode = new Html5Qrcode("reader");
-    }
-
-    await html5QrCode.start(
-
-      { facingMode: "environment" },
-
-      {
-        fps: 10,
-        qrbox: {
-          width: 250,
-          height: 250
-        }
-      },
-
-      async (decodedText) => {
-
-        if (scanProcessing) return;
-
-        scanProcessing = true;
-
-        await stopScanner();
-
-        await recordAttendance(decodedText);
-
-        scanProcessing = false;
-
-      },
-
-      () => {
-        // No QR code found in this frame.
-      }
-
-    );
-
-    scannerRunning = true;
-
-    stopButton.disabled = false;
-
-    showScanMessage(
-      "Camera is active. Point it at a student's QR code."
-    );
-
-  } catch (error) {
-
-    console.error("QR scanner error:", error);
-
-    startButton.disabled = false;
-
-    stopButton.disabled = true;
-
-    showScanMessage(
-      "Could not start camera. Check camera permission and try again.",
-      "error"
-    );
-
-  }
-
-});
-
-
-// STOP BUTTON
-
-document.getElementById("stopScannerButton")
-.addEventListener("click", async () => {
-
-  await stopScanner();
-
-  showScanMessage("Scanner stopped.");
-
-});
-
-
-// RECORD ATTENDANCE
-
-async function recordAttendance(qrToken) {
-
-  showScanMessage(
-    "QR code detected. Recording attendance..."
-  );
-
-  try {
-
-    const { data: sessionData, error: sessionError } =
-      await supabase.auth.getSession();
-
-    if (sessionError) throw sessionError;
-
-    const session = sessionData.session;
-
-    if (!session || !session.access_token) {
-      throw new Error(
-        "Your teacher session has expired. Please sign in again."
-      );
-    }
-
-
-    // VERIFY TEACHER ROLE
-
-    const { data: roleData, error: roleError } =
-      await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
-
-    if (roleError) throw roleError;
-
-    if (roleData?.role !== "teacher") {
-      throw new Error("Teacher access required.");
-    }
-
-
-    // CALL MARK-ATTENDANCE FUNCTION
-
-    const { data, error } =
-      await supabase.functions.invoke(
-        "mark-attendance",
-        {
-          body: {
-            qr_token: qrToken
-          },
-
-          headers: {
-            Authorization:
-              `Bearer ${session.access_token}`
-          }
-        }
-      );
-
-
-    if (error) {
-
-      let details = null;
-
-      try {
-        if (error.context) {
-          details = await error.context.json();
-        }
-      } catch (_) {}
-
-      console.error(
-        "Attendance response:",
-        details || error
-      );
-
-      throw new Error(
-        details?.error ||
-        details?.detail?.message ||
-        error.message ||
-        "Could not record attendance."
-      );
-    }
-
-
-    if (data?.error) {
-      throw new Error(data.error);
-    }
-
-
-    showScanMessage(
-      data?.message ||
-      "Attendance recorded successfully!",
-      "success"
-    );
-
-  } catch (error) {
-
-    console.error("Attendance error:", error);
-
-    showScanMessage(
-      error.message || "Attendance recording failed.",
-      "error"
-    );
-
-  }
-
-}
-
-
-
-// SCHOOL CALENDAR MANAGEMENT
-
-const calendarMessage = document.getElementById("calendarLoadMessage");
-
-function setCalendarMessage(message, isError = false) {
-  calendarMessage.textContent = message;
-  calendarMessage.style.color = isError ? "#a32121" : "#68798d";
+function escapeCalendarText(value) {
+  return escapeHtml(value);
 }
 
 function formatDate(dateValue) {
@@ -1124,22 +425,313 @@ function formatDate(dateValue) {
   });
 }
 
-function escapeCalendarText(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-  })[char]);
+// CHECK TEACHER SESSION
+async function checkTeacher() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
+
+  const session = data.session;
+
+  if (!session) {
+    loginSection.hidden = false;
+    teacherSection.hidden = true;
+    return;
+  }
+
+  const { data: roleData, error: roleError } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", session.user.id)
+    .maybeSingle();
+
+  if (roleError) throw roleError;
+
+  if (roleData?.role !== "teacher") {
+    await supabase.auth.signOut();
+    loginSection.hidden = false;
+    teacherSection.hidden = true;
+    loginMessage.textContent = "Teacher access required.";
+    return;
+  }
+
+  loginSection.hidden = true;
+  teacherSection.hidden = false;
+
+  document.getElementById("teacherEmailDisplay").textContent =
+    session.user.email || "Authorised teacher";
+
+  await loadCalendarData();
+  await loadSchoolDays();
 }
 
+// TEACHER LOGIN
+document.getElementById("teacherLoginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const email = document.getElementById("teacherEmail").value.trim();
+  const password = document.getElementById("teacherPassword").value;
+  const button = document.getElementById("loginButton");
+
+  button.disabled = true;
+  loginMessage.textContent = "Checking teacher account...";
+
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+
+    await checkTeacher();
+    if (!teacherSection.hidden) loginMessage.textContent = "";
+  } catch (error) {
+    console.error("Teacher login error:", error);
+    loginMessage.textContent = error.message || "Could not sign in.";
+  } finally {
+    button.disabled = false;
+  }
+});
+
+// STUDENT REGISTRATION
+document.getElementById("studentForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const button = document.getElementById("createStudentButton");
+  const admission_number = document.getElementById("admissionNumber").value.trim();
+  const full_name = document.getElementById("fullName").value.trim();
+  const password = document.getElementById("studentPassword").value;
+
+  button.disabled = true;
+  studentMessage.textContent = "Creating student account...";
+  document.getElementById("qrResult").hidden = true;
+
+  try {
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError) throw sessionError;
+
+    const session = sessionData.session;
+    if (!session?.access_token) {
+      throw new Error("Teacher session expired. Please sign in again.");
+    }
+
+    const { data: roleData, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .maybeSingle();
+
+    if (roleError) throw roleError;
+    if (roleData?.role !== "teacher") throw new Error("Teacher access required.");
+
+    const { data, error } = await supabase.functions.invoke("create-student", {
+      body: { admission_number, full_name, password },
+      headers: { Authorization: `Bearer ${session.access_token}` }
+    });
+
+    if (error) {
+      let details = null;
+      try {
+        if (error.context) details = await error.context.json();
+      } catch (_) {}
+
+      console.error("Student registration response:", details || error);
+      throw new Error(
+        details?.error || details?.detail?.message ||
+        error.message || "Student registration failed."
+      );
+    }
+
+    const student = data?.student;
+    if (!student?.qr_token) {
+      throw new Error(data?.error || "Student details were not returned.");
+    }
+
+    document.getElementById("registeredStudentName").textContent =
+      student.full_name + " · " + student.admission_number;
+
+    await QRCode.toCanvas(document.getElementById("qrCanvas"), student.qr_token, {
+      width: 240,
+      margin: 2,
+      errorCorrectionLevel: "H"
+    });
+
+    document.getElementById("qrResult").hidden = false;
+    studentMessage.textContent = "Student account created successfully.";
+    document.getElementById("studentForm").reset();
+
+  } catch (error) {
+    console.error("Student registration error:", error);
+    studentMessage.textContent = error.message || "Could not create student account.";
+  } finally {
+    button.disabled = false;
+  }
+});
+
+// PRINT QR CODE
+document.getElementById("printQrButton").addEventListener("click", () => {
+  const canvas = document.getElementById("qrCanvas");
+  const image = canvas.toDataURL("image/png");
+  const name = document.getElementById("registeredStudentName").textContent;
+  const printWindow = window.open("", "_blank");
+
+  if (!printWindow) {
+    alert("Please allow pop-ups to print the QR code.");
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>Student QR Code</title></head>
+    <body style="font-family:Arial;text-align:center;padding:30px">
+      <h2>Commerce Attendance Tracker</h2>
+      <p>${escapeHtml(name)}</p>
+      <img src="${image}" width="240" height="240">
+      <p>R / Eheliyagoda Central College</p>
+      <script>window.onload = () => window.print();<\/script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+});
+
+// SCAN MESSAGE
+function showScanMessage(message, type = "") {
+  scanMessage.textContent = message;
+  scanMessage.className = "scan-message";
+  if (type) scanMessage.classList.add(type);
+}
+
+// STOP SCANNER
+async function stopScanner() {
+  if (html5QrCode && scannerRunning) {
+    try {
+      await html5QrCode.stop();
+    } catch (error) {
+      console.warn("Scanner stop:", error);
+    }
+    scannerRunning = false;
+  }
+
+  document.getElementById("startScannerButton").disabled = false;
+  document.getElementById("stopScannerButton").disabled = true;
+}
+
+// START SCANNER
+document.getElementById("startScannerButton").addEventListener("click", async () => {
+  const startButton = document.getElementById("startScannerButton");
+  const stopButton = document.getElementById("stopScannerButton");
+
+  startButton.disabled = true;
+  showScanMessage("Starting camera... Please allow camera access.");
+
+  try {
+    if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+
+    await html5QrCode.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      async decodedText => {
+        if (scanProcessing) return;
+        scanProcessing = true;
+        await stopScanner();
+        await recordAttendance(decodedText);
+        scanProcessing = false;
+      },
+      () => {}
+    );
+
+    scannerRunning = true;
+    stopButton.disabled = false;
+    showScanMessage("Camera is active. Point it at a student's QR code.");
+
+  } catch (error) {
+    console.error("QR scanner error:", error);
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    showScanMessage(
+      "Could not start camera. Check camera permission and try again.",
+      "error"
+    );
+  }
+});
+
+// STOP BUTTON
+document.getElementById("stopScannerButton").addEventListener("click", async () => {
+  await stopScanner();
+  showScanMessage("Scanner stopped.");
+});
+
+// RECORD ATTENDANCE
+async function recordAttendance(qrToken) {
+  showScanMessage("QR code detected. Recording attendance...");
+
+  try {
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError) throw sessionError;
+
+    const session = sessionData.session;
+    if (!session?.access_token) {
+      throw new Error("Your teacher session has expired. Please sign in again.");
+    }
+
+    const { data: roleData, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .maybeSingle();
+
+    if (roleError) throw roleError;
+    if (roleData?.role !== "teacher") throw new Error("Teacher access required.");
+
+    const { data, error } = await supabase.functions.invoke("mark-attendance", {
+      body: { qr_token: qrToken },
+      headers: { Authorization: `Bearer ${session.access_token}` }
+    });
+
+    if (error) {
+      let details = null;
+      try {
+        if (error.context) details = await error.context.json();
+      } catch (_) {}
+
+      console.error("Attendance response:", details || error);
+      throw new Error(
+        details?.error || details?.detail?.message ||
+        error.message || "Could not record attendance."
+      );
+    }
+
+    if (data?.error) throw new Error(data.error);
+
+    showScanMessage(
+      data?.message || "Attendance recorded successfully!",
+      "success"
+    );
+
+  } catch (error) {
+    console.error("Attendance error:", error);
+    showScanMessage(error.message || "Attendance recording failed.", "error");
+  }
+}
+
+// SCHOOL CALENDAR MESSAGES
+function setCalendarMessage(message, isError = false) {
+  calendarMessage.textContent = message;
+  calendarMessage.style.color = isError ? "#a32121" : "#68798d";
+}
+
+// LOAD SCHOOL CALENDAR
 async function loadCalendarData() {
   setCalendarMessage("Loading school calendar...");
+
   try {
     const [yearsResult, termsResult, holidaysResult] = await Promise.all([
       supabase.from("academic_years")
         .select("id, year_name, start_date, end_date")
         .order("start_date", { ascending: false }),
+
       supabase.from("school_terms")
         .select("id, academic_year_id, term_name, start_date, end_date")
         .order("start_date", { ascending: true }),
+
       supabase.from("school_holidays")
         .select("id, academic_year_id, holiday_name, holiday_date, holiday_type")
         .order("holiday_date", { ascending: true })
@@ -1159,6 +751,7 @@ async function loadCalendarData() {
 
     document.getElementById("termYear").innerHTML =
       '<option value="">Select academic year</option>' + yearOptions;
+
     document.getElementById("holidayYear").innerHTML =
       '<option value="">Not linked to a year</option>' + yearOptions;
 
@@ -1169,7 +762,8 @@ async function loadCalendarData() {
     document.getElementById("academicYearsList").innerHTML = years.length
       ? years.map(year => `
           <div class="calendar-item">
-            <div><strong>${escapeCalendarText(year.year_name)}</strong>
+            <div>
+              <strong>${escapeCalendarText(year.year_name)}</strong>
               <small>${formatDate(year.start_date)} – ${formatDate(year.end_date)}</small>
             </div>
             <button class="secondary-btn" type="button" data-delete-year="${year.id}">Delete</button>
@@ -1179,7 +773,8 @@ async function loadCalendarData() {
     document.getElementById("schoolTermsList").innerHTML = terms.length
       ? terms.map(term => `
           <div class="calendar-item">
-            <div><strong>${escapeCalendarText(term.term_name)}</strong>
+            <div>
+              <strong>${escapeCalendarText(term.term_name)}</strong>
               <small>${escapeCalendarText(yearNameById[String(term.academic_year_id)] || "Academic year")} · ${formatDate(term.start_date)} – ${formatDate(term.end_date)}</small>
             </div>
             <button class="secondary-btn" type="button" data-delete-term="${term.id}">Delete</button>
@@ -1189,7 +784,8 @@ async function loadCalendarData() {
     document.getElementById("schoolHolidaysList").innerHTML = holidays.length
       ? holidays.map(holiday => `
           <div class="calendar-item">
-            <div><strong>${escapeCalendarText(holiday.holiday_name)}</strong>
+            <div>
+              <strong>${escapeCalendarText(holiday.holiday_name)}</strong>
               <small>${formatDate(holiday.holiday_date)} · ${escapeCalendarText(holiday.holiday_type)}${holiday.academic_year_id ? " · " + escapeCalendarText(yearNameById[String(holiday.academic_year_id)] || "") : ""}</small>
             </div>
             <button class="secondary-btn" type="button" data-delete-holiday="${holiday.id}">Delete</button>
@@ -1197,6 +793,7 @@ async function loadCalendarData() {
       : "<p>No holidays added yet.</p>";
 
     setCalendarMessage("School calendar loaded.");
+
   } catch (error) {
     console.error("Calendar load error:", error);
     setCalendarMessage(
@@ -1206,10 +803,13 @@ async function loadCalendarData() {
   }
 }
 
+// ADD ACADEMIC YEAR
 document.getElementById("academicYearForm").addEventListener("submit", async event => {
   event.preventDefault();
+
   const button = document.getElementById("saveYearButton");
   const message = document.getElementById("yearMessage");
+
   const year_name = document.getElementById("yearName").value.trim();
   const start_date = document.getElementById("yearStartDate").value;
   const end_date = document.getElementById("yearEndDate").value;
@@ -1221,14 +821,18 @@ document.getElementById("academicYearForm").addEventListener("submit", async eve
 
   button.disabled = true;
   message.textContent = "Saving academic year...";
+
   try {
     const { error } = await supabase.from("academic_years").insert({
       year_name, start_date, end_date
     });
+
     if (error) throw error;
+
     document.getElementById("academicYearForm").reset();
     message.textContent = "Academic year saved successfully.";
     await loadCalendarData();
+
   } catch (error) {
     console.error("Save academic year error:", error);
     message.textContent = error.message || "Could not save academic year.";
@@ -1237,10 +841,13 @@ document.getElementById("academicYearForm").addEventListener("submit", async eve
   }
 });
 
+// ADD SCHOOL TERM
 document.getElementById("termForm").addEventListener("submit", async event => {
   event.preventDefault();
+
   const button = document.getElementById("saveTermButton");
   const message = document.getElementById("termMessage");
+
   const academic_year_id = Number(document.getElementById("termYear").value);
   const term_name = document.getElementById("termName").value;
   const start_date = document.getElementById("termStartDate").value;
@@ -1250,6 +857,7 @@ document.getElementById("termForm").addEventListener("submit", async event => {
     message.textContent = "Please select an academic year.";
     return;
   }
+
   if (end_date < start_date) {
     message.textContent = "End date must be on or after the start date.";
     return;
@@ -1257,14 +865,18 @@ document.getElementById("termForm").addEventListener("submit", async event => {
 
   button.disabled = true;
   message.textContent = "Saving school term...";
+
   try {
     const { error } = await supabase.from("school_terms").insert({
       academic_year_id, term_name, start_date, end_date
     });
+
     if (error) throw error;
+
     document.getElementById("termForm").reset();
     message.textContent = "School term saved successfully.";
     await loadCalendarData();
+
   } catch (error) {
     console.error("Save school term error:", error);
     message.textContent = error.message || "Could not save school term.";
@@ -1273,8 +885,8 @@ document.getElementById("termForm").addEventListener("submit", async event => {
   }
 });
 
+// MARK HOLIDAY AS NON-SCHOOL DAY
 async function markDateAsNonSchoolDay(dateValue) {
-  // Keep the existing school_days table in sync so attendance calculations can exclude this date.
   const { data: existingDay, error: findError } = await supabase
     .from("school_days")
     .select("id")
@@ -1284,24 +896,35 @@ async function markDateAsNonSchoolDay(dateValue) {
 
   if (findError) throw findError;
 
+  const dayData = {
+    school_date: dateValue,
+    is_school_day: false,
+    is_special_school_day: false
+  };
+
   if (existingDay) {
     const { error } = await supabase
       .from("school_days")
-      .update({ is_school_day: false })
+      .update(dayData)
       .eq("id", existingDay.id);
+
     if (error) throw error;
   } else {
     const { error } = await supabase
       .from("school_days")
-      .insert({ school_date: dateValue, is_school_day: false });
+      .insert(dayData);
+
     if (error) throw error;
   }
 }
 
+// ADD HOLIDAY
 document.getElementById("holidayForm").addEventListener("submit", async event => {
   event.preventDefault();
+
   const button = document.getElementById("saveHolidayButton");
   const message = document.getElementById("holidayMessage");
+
   const yearValue = document.getElementById("holidayYear").value;
   const holiday_name = document.getElementById("holidayName").value.trim();
   const holiday_date = document.getElementById("holidayDate").value;
@@ -1309,16 +932,23 @@ document.getElementById("holidayForm").addEventListener("submit", async event =>
 
   button.disabled = true;
   message.textContent = "Saving holiday...";
+
   try {
     const { error } = await supabase.from("school_holidays").insert({
       academic_year_id: yearValue ? Number(yearValue) : null,
       holiday_name, holiday_date, holiday_type
     });
+
     if (error) throw error;
+
     await markDateAsNonSchoolDay(holiday_date);
+
     document.getElementById("holidayForm").reset();
     message.textContent = "Holiday saved and marked as a non-school day.";
+
     await loadCalendarData();
+    await loadSchoolDays();
+
   } catch (error) {
     console.error("Save holiday error:", error);
     message.textContent = error.message || "Could not save holiday.";
@@ -1327,13 +957,14 @@ document.getElementById("holidayForm").addEventListener("submit", async event =>
   }
 });
 
-// Delete actions are delegated because calendar rows are re-rendered after each change.
+// DELETE CALENDAR ITEMS
 document.getElementById("calendarManagement").addEventListener("click", async event => {
   const button = event.target.closest("button");
   if (!button) return;
 
   let table = "";
   let id = "";
+
   if (button.dataset.deleteYear) {
     table = "academic_years";
     id = button.dataset.deleteYear;
@@ -1353,11 +984,14 @@ document.getElementById("calendarManagement").addEventListener("click", async ev
   if (!confirm(`Delete this ${itemType}? This cannot be undone.`)) return;
 
   button.disabled = true;
+
   try {
     const { error } = await supabase.from(table).delete().eq("id", id);
     if (error) throw error;
+
     setCalendarMessage(`${itemType} deleted successfully.`);
     await loadCalendarData();
+
   } catch (error) {
     console.error("Calendar delete error:", error);
     setCalendarMessage(error.message || `Could not delete ${itemType}.`, true);
@@ -1365,16 +999,166 @@ document.getElementById("calendarManagement").addEventListener("click", async ev
   }
 });
 
+// LOAD SCHOOL DAYS
+async function loadSchoolDays() {
+  const list = document.getElementById("schoolDaysList");
+  list.textContent = "Loading...";
+
+  try {
+    const { data, error } = await supabase
+      .from("school_days")
+      .select("id, school_date, is_school_day, is_special_school_day")
+      .order("school_date", { ascending: false })
+      .limit(100);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      list.innerHTML = "<p>No school days added yet.</p>";
+      return;
+    }
+
+    list.innerHTML = data.map(day => {
+      let status = "Non-school Day";
+
+      if (day.is_school_day) {
+        status = day.is_special_school_day
+          ? "Special Weekend School Day"
+          : "School Day";
+      }
+
+      return `
+        <div class="calendar-item">
+          <div>
+            <strong>${escapeCalendarText(formatDate(day.school_date))}</strong>
+            <small>${status}</small>
+          </div>
+          <button class="secondary-btn" type="button"
+            data-edit-school-day="${day.id}">
+            Edit
+          </button>
+        </div>`;
+    }).join("");
+
+  } catch (error) {
+    console.error("Load school days error:", error);
+    list.textContent = error.message || "Could not load school days.";
+  }
+}
+
+// SAVE OR UPDATE SCHOOL DAY
+document.getElementById("schoolDayForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const button = document.getElementById("saveSchoolDayButton");
+  const message = document.getElementById("schoolDayMessage");
+
+  const dateValue = document.getElementById("schoolDayDate").value;
+  const status = document.getElementById("schoolDayStatus").value;
+
+  if (!dateValue) {
+    message.textContent = "Please select a date.";
+    return;
+  }
+
+  const selectedDate = new Date(dateValue + "T00:00:00");
+  const dayOfWeek = selectedDate.getDay();
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+  const isSchoolDay = status === "school";
+  const isSpecialSchoolDay = isSchoolDay && isWeekend;
+
+  button.disabled = true;
+  message.textContent = "Saving school day...";
+
+  try {
+    const { data: existingDay, error: findError } = await supabase
+      .from("school_days")
+      .select("id")
+      .eq("school_date", dateValue)
+      .limit(1)
+      .maybeSingle();
+
+    if (findError) throw findError;
+
+    const dayData = {
+      school_date: dateValue,
+      is_school_day: isSchoolDay,
+      is_special_school_day: isSpecialSchoolDay
+    };
+
+    if (existingDay) {
+      const { error } = await supabase
+        .from("school_days")
+        .update(dayData)
+        .eq("id", existingDay.id);
+
+      if (error) throw error;
+    } else {
+      const { error } = await supabase
+        .from("school_days")
+        .insert(dayData);
+
+      if (error) throw error;
+    }
+
+    message.textContent = isSpecialSchoolDay
+      ? "Special weekend school day saved successfully."
+      : isSchoolDay
+        ? "School day saved successfully."
+        : "Non-school day saved successfully.";
+
+    document.getElementById("schoolDayForm").reset();
+    await loadSchoolDays();
+
+  } catch (error) {
+    console.error("Save school day error:", error);
+    message.textContent = error.message || "Could not save school day.";
+  } finally {
+    button.disabled = false;
+  }
+});
+
+// EDIT SAVED SCHOOL DAY
+document.getElementById("schoolDaysList").addEventListener("click", async event => {
+  const button = event.target.closest("[data-edit-school-day]");
+  if (!button) return;
+
+  const id = button.dataset.editSchoolDay;
+
+  try {
+    const { data, error } = await supabase
+      .from("school_days")
+      .select("school_date, is_school_day")
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+
+    document.getElementById("schoolDayDate").value = data.school_date;
+    document.getElementById("schoolDayStatus").value =
+      data.is_school_day ? "school" : "non-school";
+
+    document.getElementById("schoolDayMessage").textContent =
+      "Date loaded. Change the status if needed and press Save School Day.";
+
+    document.getElementById("schoolDayDate").scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+  } catch (error) {
+    console.error("Edit school day error:", error);
+    document.getElementById("schoolDayMessage").textContent =
+      error.message || "Could not load this date.";
+  }
+});
 
 // LOGOUT
-
-document.getElementById("logoutButton")
-.addEventListener("click", async () => {
-
+document.getElementById("logoutButton").addEventListener("click", async () => {
   await stopScanner();
 
-  const { error } =
-    await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
 
   if (error) {
     alert("Could not sign out. Please try again.");
@@ -1383,28 +1167,16 @@ document.getElementById("logoutButton")
 
   teacherSection.hidden = true;
   loginSection.hidden = false;
-
-  document.getElementById(
-    "teacherLoginForm"
-  ).reset();
-
-  loginMessage.textContent =
-    "You have signed out.";
-
+  document.getElementById("teacherLoginForm").reset();
+  loginMessage.textContent = "You have signed out.";
 });
-
 
 // INITIAL CHECK
-
 checkTeacher().catch(error => {
-
   console.error("Teacher access error:", error);
-
   loginMessage.textContent =
     "Could not verify teacher access. Please try again.";
-
 });
-
 </script>
 
 </body>
